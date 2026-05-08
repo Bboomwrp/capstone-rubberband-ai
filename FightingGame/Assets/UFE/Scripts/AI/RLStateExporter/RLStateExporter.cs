@@ -156,7 +156,7 @@ public class RLStateExporter : MonoBehaviour
             Debug.LogWarning("[RL] Write failed");
         }
 
-        Debug.Log("🧠 RL Export @" + timer.ToString("F2"));
+        // Debug.Log("🧠 RL Export @" + timer.ToString("F2"));
     }
 
     void OnGameEnds(CharacterInfo winner, CharacterInfo loser)

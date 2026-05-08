@@ -14,14 +14,15 @@ from utils import state_to_vector
 # =========================================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UNITY_PATH = r"C:\Users\booms\AppData\LocalLow\DefaultCompany\Fighting Game"
 
 STATE_FILE = os.path.join(
-    BASE_DIR,
+    UNITY_PATH,
     "rl_state.json"
 )
 
 ACTION_FILE = os.path.join(
-    BASE_DIR,
+    UNITY_PATH,
     "rl_action.json"
 )
 

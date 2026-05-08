@@ -133,8 +133,8 @@ Gameplay
 
 ## Authors
 
-- YOUR NAME
-- TEAM MEMBER NAME
+- "Weeraphat Plengudomkij"
+- "Kaj Ruanglertmaneepong"
 
 CEDT Capstone Project  
 Chulalongkorn University
