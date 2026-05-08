@@ -1,0 +1,3186 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f9522b1b0f53b4c87d047ac5c3794f, type: 3}
+  m_Name: Kikosho (Ultra) Shortcut
+  m_EditorClassIdentifier: 
+  characterPrefab: {fileID: 1254811949002422, guid: 7671bb4083035e04e8d97aa2297b7407,
+    type: 2}
+  moveName: Kikosho shortcut
+  description: Kikosho shortcut
+  fps: 60
+  ignoreGravity: 0
+  ignoreFriction: 0
+  cancelMoveWheLanding: 0
+  forceMirrorLeft: 0
+  forceMirrorRight: 0
+  invertRotationLeft: 0
+  invertRotationRight: 0
+  autoCorrectRotation: 0
+  frameWindowRotation: 0
+  gaugeToggle: 0
+  startDrainingGauge: 0
+  inhibitGainWhileDraining: 0
+  stopDrainingGauge: 0
+  gaugeDPS: 0
+  totalDrain: 0
+  gaugeRequired: 0
+  gaugeUsage: 0
+  gaugeGainOnMiss: 0
+  gaugeGainOnHit: 0
+  gaugeGainOnBlock: 0
+  opGaugeGainOnBlock: 0
+  opGaugeGainOnParry: 0
+  opGaugeGainOnHit: 0
+  DCMove: {fileID: 0}
+  DCStance: 0
+  useUltraGauge: 1
+  isUltraMove: 1
+  possibleStates: 00000000
+  possibleMoveStates: []
+  animationClip: {fileID: 7400000, guid: 452fc48d8c286e54d87ffd6ebff81d18, type: 3}
+  disableHeadLook: 1
+  wrapMode: 0
+  fixedSpeed: 1
+  animationSpeed: 1
+  animSpeedKeyFrame: []
+  totalFrames: 256
+  startUpFrames: 57
+  activeFrames: 120
+  recoveryFrames: 79
+  applyRootMotion: 0
+  forceGrounded: 0
+  rootMotionNode: 0
+  overrideBlendingIn: 1
+  overrideBlendingOut: 1
+  blendingIn: 0
+  blendingOut: 0
+  chargeMove: 0
+  chargeTiming: 0.7
+  allowInputLeniency: 0
+  allowNegativeEdge: 1
+  leniencyBuffer: 3
+  onReleaseExecution: 0
+  requireButtonPress: 1
+  onPressExecution: 1
+  buttonSequence: 
+  buttonExecution: 0a000000
+  previousMoves: []
+  frameLinks: []
+  particleEffects:
+  - castingFrame: 0
+    particleEffect:
+      editorToggle: 0
+      prefab: {fileID: 1286632702608012, guid: 10a5aa2e5ffe24b48a37c3d6954181d4, type: 2}
+      duration: 1.2
+      stick: 0
+      destroyOnMoveOver: 1
+      followRotation: 0
+      lockLocalPosition: 0
+      mirrorOn2PSide: 0
+      initialRotation: {x: 0, y: 0, z: 0}
+      positionOffSet: {x: 0, y: 1, z: 0}
+      bodyPart: 2
+  - castingFrame: 57
+    particleEffect:
+      editorToggle: 0
+      prefab: {fileID: 1486614223075050, guid: 9fa42fff283695645ac43131aa4778b0, type: 2}
+      duration: 2
+      stick: 1
+      destroyOnMoveOver: 1
+      followRotation: 0
+      lockLocalPosition: 1
+      mirrorOn2PSide: 0
+      initialRotation: {x: 0, y: 0, z: 0}
+      positionOffSet: {x: 0, y: 0, z: 0}
+      bodyPart: 8
+  appliedForces: []
+  slowMoEffects: []
+  bodyPartVisibilityChanges: []
+  opponentOverride: []
+  soundEffects:
+  - castingFrame: 0
+    sound: {fileID: 0}
+    sounds:
+    - {fileID: 8300000, guid: 4d403211f8809934dab7d665b461b0e4, type: 3}
+    soundEffectsToggle: 0
+  inGameAlert: []
+  stanceChanges: []
+  cameraMovements:
+  - cinematicType: 0
+    animationClip: {fileID: 0}
+    prefab: {fileID: 0}
+    camAnimationSpeed: 1
+    blendSpeed: 100
+    gameObjectPosition: {x: 0, y: 0, z: 0}
+    position: {x: 0, y: 4, z: -10}
+    rotation: {x: 2, y: 0, z: 0}
+    castingFrame: 0
+    duration: 0.95
+    fieldOfView: 54.4
+    camSpeed: 100
+    freezePhysics: 1
+    myAnimationSpeed: 100
+    opAnimationSpeed: 0
+    previewToggle: 0
+    startTime: 0
+  hits:
+  - activeFramesBegin: 58
+    activeFramesEnds: 64
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 1
+    hitStunOptionsToggle: 1
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 0
+    pullInToggle: 1
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 64
+    activeFramesEnds: 70
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 70
+    activeFramesEnds: 76
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 2}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 76
+    activeFramesEnds: 82
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 82
+    activeFramesEnds: 88
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 88
+    activeFramesEnds: 94
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 2}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 94
+    activeFramesEnds: 100
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 100
+    activeFramesEnds: 106
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 106
+    activeFramesEnds: 112
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 2}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 112
+    activeFramesEnds: 118
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 118
+    activeFramesEnds: 124
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 124
+    activeFramesEnds: 130
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 2}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 130
+    activeFramesEnds: 136
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 136
+    activeFramesEnds: 142
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 142
+    activeFramesEnds: 148
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 2}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 148
+    activeFramesEnds: 154
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 154
+    activeFramesEnds: 160
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 160
+    activeFramesEnds: 166
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 2}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 166
+    activeFramesEnds: 172
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 15
+    damageOnBlock: 4
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 1
+    pushForce: {x: 2, y: 0}
+    pushForceAir: {x: 2, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 0
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  - activeFramesBegin: 172
+    activeFramesEnds: 178
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    cancelProjectile: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 1
+      statesToggle: 1
+    downHit: 0
+    resetPreviousHitStun: 1
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 4
+    hitStunType: 1
+    hitStunOnHit: 22
+    hitStunOnBlock: 18
+    frameAdvantageOnHit: 0
+    frameAdvantageOnBlock: 0
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 80
+    damageOnBlock: 20
+    stundamage: 0
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 0
+    pushForce: {x: 40, y: 40}
+    pushForceAir: {x: 0, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    - bodyPart: 8
+      shape: 0
+      rect:
+        serializedVersion: 2
+        x: 0.6
+        y: 0.14
+        width: 4.93
+        height: 3.25
+      followXBounds: 0
+      followYBounds: 0
+      radius: 6
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 1
+    hitStunOptionsToggle: 0
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 0
+    hitConditionsToggle: 1
+    pullInToggle: 0
+    hurtBoxesToggle: 0
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  blockableArea:
+    activeFramesBegin: 23
+    activeFramesEnds: 190
+    bodyPart: 2
+    shape: 0
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 4
+      height: 4
+    followXBounds: 0
+    followYBounds: 0
+    radius: 9.4
+    offSet: {x: 0, y: 0}
+    position: {x: 0, y: 0, z: 0}
+  invincibleBodyParts:
+  - bodyParts: 
+    completelyInvincible: 1
+    ignoreBodyColliders: 0
+    activeFramesBegin: 0
+    activeFramesEnds: 59
+    hitBoxes: []
+  armorOptions:
+    activeFramesBegin: 0
+    activeFramesEnds: 1
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    hitAbsorption: 0
+    damageAbsorption: 0
+    nonAffectedBodyParts: 
+  projectiles: []
+  opponentConditions:
+    basicMoveLimitation: 
+    possibleMoveStates: []
+    basicMovesToggle: 0
+    statesToggle: 0
+  selfConditions:
+    basicMoveLimitation: 
+    possibleMoveStates:
+    - possibleState: 0
+      jumpArc: 0
+      jumpArcBegins: 0
+      jumpArcEnds: 100
+      opponentDistance: 6
+      proximityRangeBegins: 0
+      proximityRangeEnds: 100
+      movingForward: 1
+      movingBack: 1
+      standBy: 1
+      blocking: 0
+      stunned: 0
+      isCornor: 0
+    - possibleState: 1
+      jumpArc: 0
+      jumpArcBegins: 0
+      jumpArcEnds: 100
+      opponentDistance: 0
+      proximityRangeBegins: 0
+      proximityRangeEnds: 100
+      movingForward: 1
+      movingBack: 1
+      standBy: 1
+      blocking: 0
+      stunned: 0
+      isCornor: 0
+    basicMovesToggle: 0
+    statesToggle: 0
+  moveClassification:
+    attackType: 1
+    hitType: 0
+    startupSpeed: 4
+    recoverySpeed: 5
+    hitConfirmType: 0
+    preferableDistance: 2
+    gaugeUsage: 0
+    anyAttackType: 1
+    anyHitType: 1
+    anyHitConfirmType: 1
+  speedKeyFrameToggle: 1

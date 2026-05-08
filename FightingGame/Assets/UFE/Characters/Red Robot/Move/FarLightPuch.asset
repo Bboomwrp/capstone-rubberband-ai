@@ -1,0 +1,367 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f9522b1b0f53b4c87d047ac5c3794f, type: 3}
+  m_Name: FarLightPuch
+  m_EditorClassIdentifier: 
+  characterPrefab: {fileID: 1423186822857772, guid: 1bd2f8f15f0a8de45bdc16b9a919cf6c,
+    type: 2}
+  moveName: Far Light Punch
+  description: Far Light Punch
+  fps: 60
+  ignoreGravity: 0
+  ignoreFriction: 0
+  cancelMoveWheLanding: 0
+  forceMirrorLeft: 0
+  forceMirrorRight: 0
+  invertRotationLeft: 0
+  invertRotationRight: 0
+  autoCorrectRotation: 0
+  frameWindowRotation: 0
+  gaugeToggle: 0
+  startDrainingGauge: 0
+  inhibitGainWhileDraining: 0
+  stopDrainingGauge: 0
+  gaugeDPS: 0
+  totalDrain: 0
+  gaugeRequired: 0
+  gaugeUsage: 0
+  gaugeGainOnMiss: 0
+  gaugeGainOnHit: 2
+  gaugeGainOnBlock: 1
+  opGaugeGainOnBlock: 0.5
+  opGaugeGainOnParry: 0
+  opGaugeGainOnHit: 1
+  DCMove: {fileID: 0}
+  DCStance: 0
+  useUltraGauge: 0
+  isUltraMove: 0
+  possibleStates: 00000000
+  possibleMoveStates: []
+  animationClip: {fileID: 7400000, guid: fd5e6f8e954c40a4a90c5ade71ddd95b, type: 3}
+  disableHeadLook: 1
+  wrapMode: 0
+  fixedSpeed: 1
+  animationSpeed: 0.9
+  animSpeedKeyFrame: []
+  totalFrames: 13
+  startUpFrames: 4
+  activeFrames: 3
+  recoveryFrames: 6
+  applyRootMotion: 0
+  forceGrounded: 0
+  rootMotionNode: 0
+  overrideBlendingIn: 1
+  overrideBlendingOut: 0
+  blendingIn: 0
+  blendingOut: 0
+  chargeMove: 0
+  chargeTiming: 0.7
+  allowInputLeniency: 0
+  allowNegativeEdge: 1
+  leniencyBuffer: 3
+  onReleaseExecution: 0
+  requireButtonPress: 1
+  onPressExecution: 1
+  buttonSequence: 
+  buttonExecution: 04000000
+  previousMoves: []
+  frameLinks:
+  - linkType: 0
+    allowBuffer: 1
+    onStrike: 1
+    onBlock: 1
+    onParry: 1
+    activeFramesBegins: 6
+    activeFramesEnds: 9
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 0
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: f0e4994fdb73da94a8d796f5b7fadd83, type: 2}
+    - {fileID: 11400000, guid: c1f9eb8ba69e3e64cb3863548721fa72, type: 2}
+    - {fileID: 11400000, guid: b4cd5eb65ba453b478e6452429a1754b, type: 2}
+    - {fileID: 11400000, guid: b8bc49468e39d1444a6c7d4b4aac3beb, type: 2}
+    - {fileID: 11400000, guid: 0ce6f480c62ec754cac9e873418df6f4, type: 2}
+    - {fileID: 11400000, guid: 851c7da84256bfd42b47eeb2c1ee7429, type: 2}
+    - {fileID: 11400000, guid: 997dec9babfe884448fc8a91ce884829, type: 2}
+    - {fileID: 11400000, guid: cd34ffe5197a80f41a7f31ebc5e97b06, type: 2}
+    - {fileID: 11400000, guid: cd341efc0055c0e4d9aa27e363335fdc, type: 2}
+    - {fileID: 11400000, guid: 18cb3977d0496ec4f8812b86aa28e981, type: 2}
+    - {fileID: 11400000, guid: 6b38958b7d518db44b7a1f70c96c70ca, type: 2}
+    - {fileID: 11400000, guid: 2e3e5916c144b874794f907c9505b798, type: 2}
+    - {fileID: 11400000, guid: 3f96b2fe331a29342b33f4ce95202d03, type: 2}
+    - {fileID: 11400000, guid: f9b1bf4285a6db748a8aff5464ea52dc, type: 2}
+    - {fileID: 11400000, guid: c0e679bd555103e44b8f9ace48c3c694, type: 2}
+    - {fileID: 11400000, guid: 1e2a8b47f933b5140b0768518aba4c6e, type: 2}
+    - {fileID: 11400000, guid: 84a35a5b5f9e54d4a85b95716365eec6, type: 2}
+    - {fileID: 11400000, guid: 8e23cf9dd45da914790c5868ff160de9, type: 2}
+    - {fileID: 11400000}
+    - {fileID: 11400000, guid: f5a65022e9ee96b4b9fe3ce2a2e19381, type: 2}
+    - {fileID: 11400000, guid: 0e6090f68def8e744a7d3c852bae3b95, type: 2}
+    - {fileID: 11400000, guid: 0fe47fffc1cdace4397a462792136d80, type: 2}
+    - {fileID: 11400000, guid: da11ff6de7823b84b8132e2d31cccae5, type: 2}
+    - {fileID: 11400000, guid: c5b906be7a5c14b42ab2688da30d599a, type: 2}
+    - {fileID: 11400000, guid: 1f62645f1eb1e2347a14940f569206d0, type: 2}
+    - {fileID: 11400000, guid: 952e2cab45979dc458757cb11c52f3c4, type: 2}
+    - {fileID: 11400000, guid: 616577b3aa7b1a046acebf203ad73140, type: 2}
+    - {fileID: 11400000, guid: 8f910c786be014b489d0bcb1de233a33, type: 2}
+    - {fileID: 11400000, guid: 8d508b15b9a90fb4094bafaac081f6ae, type: 2}
+    - {fileID: 11400000, guid: 10804df8d4a247e4894e45f2e867d879, type: 2}
+    - {fileID: 11400000, guid: e04720824de322a4da187234e84f9356, type: 2}
+    - {fileID: 11400000, guid: 06d97c8b6f2c9c14cb6484301ad1dfcc, type: 2}
+    - {fileID: 11400000, guid: 057322634b0b3944d9bec735a6ef8b30, type: 2}
+    - {fileID: 11400000, guid: 319bc43b957082840bb410826a47b3d7, type: 2}
+    - {fileID: 11400000, guid: 3bfc5078b97f8834abb8fc0b398760d6, type: 2}
+    - {fileID: 11400000, guid: 240ed742e5106fa49b983f633f139f33, type: 2}
+    - {fileID: 11400000, guid: dc9d0d87c84bf25458c3188eb8e2d2bb, type: 2}
+    - {fileID: 11400000, guid: ff60f2e3169f0274a8f9355a09f3a508, type: 2}
+    - {fileID: 11400000, guid: 89ea6e81c61a27b4897b2324c98d77ca, type: 2}
+    - {fileID: 11400000, guid: 6ee33dede79882e4a82ff93165898ebc, type: 2}
+    - {fileID: 11400000, guid: 08549feac9ccb8d4696188e93f2c8c27, type: 2}
+    - {fileID: 11400000, guid: 6eb906e4999237b4b8f6a01a6f6cdc54, type: 2}
+    - {fileID: 11400000, guid: e2835917bbefd2a45923b2abdafe1ad6, type: 2}
+    - {fileID: 11400000, guid: 95cd255d506bfd2408d4982dc289e1bd, type: 2}
+    - {fileID: 11400000, guid: 0424f5c751e0ad242b1b93d98f9e3d21, type: 2}
+    - {fileID: 11400000, guid: 46c13cba019d8834aa7c71d196b29b80, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 0
+    counterMoveToggle: 0
+  particleEffects: []
+  appliedForces: []
+  slowMoEffects: []
+  bodyPartVisibilityChanges: []
+  opponentOverride: []
+  soundEffects:
+  - castingFrame: 0
+    sound: {fileID: 0}
+    sounds:
+    - {fileID: 8300000, guid: 4d403211f8809934dab7d665b461b0e4, type: 3}
+    soundEffectsToggle: 0
+  inGameAlert: []
+  stanceChanges: []
+  cameraMovements: []
+  hits:
+  - activeFramesBegin: 5
+    activeFramesEnds: 8
+    hitConfirmType: 0
+    throwMove: {fileID: 0}
+    techMove: {fileID: 0}
+    techable: 1
+    resetHitAnimations: 1
+    forceStand: 0
+    armorBreaker: 0
+    continuousHit: 0
+    unblockable: 0
+    spaceBetweenHits: 0
+    spaceBetweenHitsVal: 0
+    groundHit: 1
+    crouchingHit: 1
+    airHit: 1
+    stunHit: 1
+    opponentConditions:
+      basicMoveLimitation: 
+      possibleMoveStates: []
+      basicMovesToggle: 0
+      statesToggle: 0
+    downHit: 0
+    resetPreviousHitStun: 0
+    resetCrumples: 0
+    customStunValues: 0
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    overrideEffectSpawnPoint: 0
+    spawnPoint: 1
+    overrideHitAnimationBlend: 0
+    newHitBlendingIn: 0
+    overrideJuggleWeight: 0
+    newJuggleWeight: 0
+    overrideAirRecoveryType: 0
+    newAirRecoveryType: 0
+    instantAirRecovery: 0
+    overrideHitAnimation: 0
+    overrideHitAcceleration: 1
+    accelerationMagnitude: 0.2
+    newHitAnimation: 27
+    overrideOnlyOnAirHit: 0
+    hitStrength: 0
+    hitStunType: 1
+    hitStunOnHit: 14
+    hitStunOnBlock: 11
+    frameAdvantageOnHit: 5
+    frameAdvantageOnBlock: 2
+    damageScaling: 1
+    damageType: 1
+    damageOnHit: 30
+    damageOnBlock: 0
+    stundamage: 50
+    doesntKill: 0
+    hitType: 0
+    isUltra: 0
+    resetPreviousHorizontalPush: 1
+    resetPreviousVerticalPush: 1
+    applyDifferentAirForce: 0
+    pushForce: {x: 17, y: 0}
+    pushForceAir: {x: 0, y: 0}
+    resetPreviousHorizontal: 0
+    resetPreviousVertical: 0
+    appliedForce: {x: 0, y: 0}
+    appliedForceAir: {x: 0, y: 0}
+    cornerPush: 1
+    groundBounce: 0
+    overrideForcesOnGroundBounce: 0
+    resetGroundBounceHorizontalPush: 0
+    resetGroundBounceVerticalPush: 0
+    groundBouncePushForce: {x: 0, y: 0}
+    wallBounce: 0
+    knockOutOnWallBounce: 0
+    overrideForcesOnWallBounce: 0
+    resetWallBounceHorizontalPush: 0
+    resetWallBounceVerticalPush: 0
+    wallBouncePushForce: {x: 0, y: 0}
+    bounceOnCameraEdge: 0
+    overrideCameraSpeed: 0
+    newMovementSpeed: 0
+    newRotationSpeed: 0
+    cameraSpeedDuration: 0
+    hurtBoxes:
+    - bodyPart: 17
+      shape: 1
+      rect:
+        serializedVersion: 2
+        x: 0.5
+        y: -0.43
+        width: 4.45
+        height: 3.49
+      followXBounds: 0
+      followYBounds: 0
+      radius: 0.5
+      offSet: {x: 0, y: 0}
+      isBlock: 0
+    pullEnemyIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    pullSelfIn:
+      speed: 50
+      forceStand: 1
+      characterBodyPart: 0
+      enemyBodyPart: 0
+      targetDistance: 0.5
+      position: {x: 0, y: 0, z: 0}
+    damageOptionsToggle: 1
+    hitStunOptionsToggle: 1
+    forceOptionsToggle: 1
+    opponentForceToggle: 1
+    selfForceToggle: 1
+    stageReactionsToggle: 1
+    overrideEventsToggle: 1
+    hitConditionsToggle: 1
+    pullInToggle: 1
+    hurtBoxesToggle: 1
+    wallBounceToggle: 0
+    groundBounceToggle: 0
+  blockableArea:
+    activeFramesBegin: 3
+    activeFramesEnds: 11
+    bodyPart: 2
+    shape: 0
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 4
+      height: 4
+    followXBounds: 0
+    followYBounds: 0
+    radius: 6
+    offSet: {x: 0, y: 0}
+    position: {x: 0, y: 0, z: 0}
+  invincibleBodyParts: []
+  armorOptions:
+    activeFramesBegin: 0
+    activeFramesEnds: 1
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    hitAbsorption: 0
+    damageAbsorption: 0
+    nonAffectedBodyParts: 
+  projectiles: []
+  opponentConditions:
+    basicMoveLimitation: 
+    possibleMoveStates: []
+    basicMovesToggle: 0
+    statesToggle: 0
+  selfConditions:
+    basicMoveLimitation: 
+    possibleMoveStates:
+    - possibleState: 0
+      jumpArc: 0
+      jumpArcBegins: 0
+      jumpArcEnds: 100
+      opponentDistance: 6
+      proximityRangeBegins: 20
+      proximityRangeEnds: 100
+      movingForward: 1
+      movingBack: 1
+      standBy: 1
+      blocking: 0
+      stunned: 0
+      isCornor: 0
+    basicMovesToggle: 0
+    statesToggle: 1
+  moveClassification:
+    attackType: 1
+    hitType: 0
+    startupSpeed: 4
+    recoverySpeed: 5
+    hitConfirmType: 0
+    preferableDistance: 2
+    gaugeUsage: 0
+    anyAttackType: 1
+    anyHitType: 1
+    anyHitConfirmType: 1
+  speedKeyFrameToggle: 0

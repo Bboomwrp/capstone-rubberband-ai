@@ -1,0 +1,314 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f9522b1b0f53b4c87d047ac5c3794f, type: 3}
+  m_Name: Focus Cancel
+  m_EditorClassIdentifier: 
+  characterPrefab: {fileID: 1254811949002422, guid: 7671bb4083035e04e8d97aa2297b7407,
+    type: 2}
+  moveName: Focus Cancel
+  description: Focus Gauge Cancel
+  fps: 60
+  ignoreGravity: 0
+  ignoreFriction: 0
+  cancelMoveWheLanding: 0
+  forceMirrorLeft: 0
+  forceMirrorRight: 0
+  invertRotationLeft: 0
+  invertRotationRight: 0
+  autoCorrectRotation: 0
+  frameWindowRotation: 0
+  gaugeToggle: 0
+  startDrainingGauge: 0
+  inhibitGainWhileDraining: 0
+  stopDrainingGauge: 0
+  gaugeDPS: 0
+  totalDrain: 0
+  gaugeRequired: 50
+  gaugeUsage: 50
+  gaugeGainOnMiss: 0
+  gaugeGainOnHit: 0
+  gaugeGainOnBlock: 0
+  opGaugeGainOnBlock: 0
+  opGaugeGainOnParry: 0
+  opGaugeGainOnHit: 0
+  DCMove: {fileID: 0}
+  DCStance: 0
+  useUltraGauge: 0
+  isUltraMove: 0
+  possibleStates: 00000000
+  possibleMoveStates:
+  - possibleState: 0
+    jumpArc: 0
+    jumpArcBegins: 10
+    jumpArcEnds: 90
+    opponentDistance: 0
+    proximityRangeBegins: 0
+    proximityRangeEnds: 100
+    movingForward: 1
+    movingBack: 1
+    standBy: 1
+    blocking: 0
+    stunned: 0
+    isCornor: 0
+  animationClip: {fileID: 7400000, guid: eb4c5543dedc72f4bbccf37554d3f0fd, type: 3}
+  disableHeadLook: 1
+  wrapMode: 0
+  fixedSpeed: 1
+  animationSpeed: 0.98
+  animSpeedKeyFrame: []
+  totalFrames: 64
+  startUpFrames: 19
+  activeFrames: 9
+  recoveryFrames: 16
+  applyRootMotion: 0
+  forceGrounded: 0
+  rootMotionNode: 0
+  overrideBlendingIn: 1
+  overrideBlendingOut: 1
+  blendingIn: 0
+  blendingOut: 0.05
+  chargeMove: 0
+  chargeTiming: 0.7
+  allowInputLeniency: 0
+  allowNegativeEdge: 1
+  leniencyBuffer: 3
+  onReleaseExecution: 0
+  requireButtonPress: 1
+  onPressExecution: 1
+  buttonSequence: 
+  buttonExecution: 0500000008000000
+  previousMoves:
+  - {fileID: 11400000, guid: 64a214dbbeb50694eaebf7759dcd7d40, type: 2}
+  - {fileID: 11400000, guid: 3f87f64c191251a47b3c7a28b8b0c642, type: 2}
+  - {fileID: 11400000, guid: 9fdf6f3f13abfd4408660bdf192f5548, type: 2}
+  - {fileID: 11400000, guid: 22840531c72a8114d843132cf4d7a0c5, type: 2}
+  - {fileID: 11400000, guid: 5eb81322b7b8c7646ae460d25bd99a65, type: 2}
+  - {fileID: 11400000, guid: 4300cf2f2ca1d7046a3f4874f4740c03, type: 2}
+  - {fileID: 11400000, guid: 280d46f9841d6d44fa835a42a08c11f0, type: 2}
+  - {fileID: 11400000, guid: fd5c903fba558084f98377cf596c7a1c, type: 2}
+  - {fileID: 11400000, guid: 3470576754871374aadbaaa911cfcf23, type: 2}
+  - {fileID: 11400000, guid: 87f6d21263283a34f8ef0dcdddb96da4, type: 2}
+  - {fileID: 11400000, guid: b8ce56abc16e724499a7f4563c48734d, type: 2}
+  - {fileID: 11400000, guid: 6a490995c5d856e42a9f7430b0dcaefd, type: 2}
+  - {fileID: 11400000, guid: 57354c64390c7fc4594b08db6362324f, type: 2}
+  - {fileID: 11400000, guid: 4455e38db56b216448908c34ce23814a, type: 2}
+  - {fileID: 11400000, guid: 15b385c4c1ef44f4c926dc40939700c0, type: 2}
+  - {fileID: 11400000, guid: 074853c8475248c4fa6fed40517683bc, type: 2}
+  - {fileID: 11400000, guid: 5d6a78c298a20754985dc5e40b206cd7, type: 2}
+  - {fileID: 11400000, guid: 0d89555abdc294d4faefb6b988fdc81a, type: 2}
+  - {fileID: 11400000, guid: 1f0e120f2f968aa4380bc2a168a8e195, type: 2}
+  - {fileID: 11400000, guid: 822a2e92f903dfa468ca21f9af320dae, type: 2}
+  - {fileID: 11400000, guid: ea6bd9fb8b937f142b328797f6453de4, type: 2}
+  frameLinks:
+  - linkType: 2
+    allowBuffer: 0
+    onStrike: 0
+    onBlock: 0
+    onParry: 0
+    activeFramesBegins: 1
+    activeFramesEnds: 17
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 0
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: f7981ade3c0d55147b4cc2d0b33cfb21, type: 2}
+    - {fileID: 11400000, guid: 013b0868d3ab27341a9c799520fbc362, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 1
+    counterMoveToggle: 0
+  - linkType: 2
+    allowBuffer: 0
+    onStrike: 0
+    onBlock: 0
+    onParry: 0
+    activeFramesBegins: 18
+    activeFramesEnds: 61
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 0
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: c8911bcabe9508e40a36e18de91cd20d, type: 2}
+    - {fileID: 11400000, guid: d2f82ffafcee1d3438acf1e42174db2b, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 1
+    counterMoveToggle: 0
+  - linkType: 2
+    allowBuffer: 0
+    onStrike: 1
+    onBlock: 1
+    onParry: 1
+    activeFramesBegins: 63
+    activeFramesEnds: 64
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 1
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: 909cdea592ae9414a85ccc65fbe8f793, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 0
+    counterMoveToggle: 0
+  - linkType: 2
+    allowBuffer: 0
+    onStrike: 1
+    onBlock: 1
+    onParry: 1
+    activeFramesBegins: 1
+    activeFramesEnds: 64
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 0
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: 52ec03b70bedb954c9520d7357d92d43, type: 2}
+    - {fileID: 11400000, guid: d0aa5a90c20ec59478e9b303a66bce72, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 0
+    counterMoveToggle: 0
+  particleEffects:
+  - castingFrame: 0
+    particleEffect:
+      editorToggle: 0
+      prefab: {fileID: 1286632702608012, guid: 10a5aa2e5ffe24b48a37c3d6954181d4, type: 2}
+      duration: 0.8
+      stick: 1
+      destroyOnMoveOver: 0
+      followRotation: 0
+      lockLocalPosition: 1
+      mirrorOn2PSide: 0
+      initialRotation: {x: 0, y: 0, z: 0}
+      positionOffSet: {x: 0, y: 0, z: 0}
+      bodyPart: 2
+  appliedForces:
+  - castingFrame: 0
+    resetPreviousVertical: 1
+    resetPreviousHorizontal: 1
+    force: {x: 0, y: -50}
+  slowMoEffects: []
+  bodyPartVisibilityChanges: []
+  opponentOverride: []
+  soundEffects:
+  - castingFrame: 0
+    sound: {fileID: 0}
+    sounds:
+    - {fileID: 8300000, guid: 4d403211f8809934dab7d665b461b0e4, type: 3}
+    soundEffectsToggle: 0
+  inGameAlert: []
+  stanceChanges: []
+  cameraMovements: []
+  hits: []
+  blockableArea:
+    activeFramesBegin: 1
+    activeFramesEnds: 31
+    bodyPart: 2
+    shape: 0
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 4
+      height: 4
+    followXBounds: 0
+    followYBounds: 0
+    radius: 6
+    offSet: {x: 0, y: 0}
+    position: {x: 0, y: 0, z: 0}
+  invincibleBodyParts: []
+  armorOptions:
+    activeFramesBegin: 1
+    activeFramesEnds: 64
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    hitAbsorption: 1
+    damageAbsorption: 0
+    nonAffectedBodyParts: 
+  projectiles: []
+  opponentConditions:
+    basicMoveLimitation: 
+    possibleMoveStates: []
+    basicMovesToggle: 0
+    statesToggle: 0
+  selfConditions:
+    basicMoveLimitation: 
+    possibleMoveStates:
+    - possibleState: 0
+      jumpArc: 0
+      jumpArcBegins: 0
+      jumpArcEnds: 100
+      opponentDistance: 0
+      proximityRangeBegins: 0
+      proximityRangeEnds: 100
+      movingForward: 1
+      movingBack: 1
+      standBy: 1
+      blocking: 0
+      stunned: 0
+      isCornor: 0
+    basicMovesToggle: 0
+    statesToggle: 0
+  moveClassification:
+    attackType: 5
+    hitType: 0
+    startupSpeed: 0
+    recoverySpeed: 0
+    hitConfirmType: 0
+    preferableDistance: 2
+    gaugeUsage: 3
+    anyAttackType: 1
+    anyHitType: 1
+    anyHitConfirmType: 1
+  speedKeyFrameToggle: 0

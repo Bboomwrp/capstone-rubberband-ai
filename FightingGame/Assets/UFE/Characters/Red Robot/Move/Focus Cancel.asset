@@ -1,0 +1,305 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03f9522b1b0f53b4c87d047ac5c3794f, type: 3}
+  m_Name: Focus Cancel
+  m_EditorClassIdentifier: 
+  characterPrefab: {fileID: 1423186822857772, guid: 1bd2f8f15f0a8de45bdc16b9a919cf6c,
+    type: 2}
+  moveName: Focus Cancel
+  description: Focus Gauge Cancel
+  fps: 60
+  ignoreGravity: 0
+  ignoreFriction: 0
+  cancelMoveWheLanding: 0
+  forceMirrorLeft: 0
+  forceMirrorRight: 0
+  invertRotationLeft: 0
+  invertRotationRight: 0
+  autoCorrectRotation: 0
+  frameWindowRotation: 0
+  gaugeToggle: 0
+  startDrainingGauge: 0
+  inhibitGainWhileDraining: 0
+  stopDrainingGauge: 0
+  gaugeDPS: 0
+  totalDrain: 0
+  gaugeRequired: 50
+  gaugeUsage: 50
+  gaugeGainOnMiss: 0
+  gaugeGainOnHit: 0
+  gaugeGainOnBlock: 0
+  opGaugeGainOnBlock: 0
+  opGaugeGainOnParry: 0
+  opGaugeGainOnHit: 0
+  DCMove: {fileID: 0}
+  DCStance: 0
+  useUltraGauge: 0
+  isUltraMove: 0
+  possibleStates: 00000000
+  possibleMoveStates:
+  - possibleState: 0
+    jumpArc: 0
+    jumpArcBegins: 10
+    jumpArcEnds: 90
+    opponentDistance: 0
+    proximityRangeBegins: 0
+    proximityRangeEnds: 100
+    movingForward: 1
+    movingBack: 1
+    standBy: 1
+    blocking: 0
+    stunned: 0
+    isCornor: 0
+  animationClip: {fileID: 7400000, guid: ae34876440e1c724b9b0f9645e8e4217, type: 3}
+  disableHeadLook: 1
+  wrapMode: 0
+  fixedSpeed: 1
+  animationSpeed: 0.98
+  animSpeedKeyFrame: []
+  totalFrames: 64
+  startUpFrames: 19
+  activeFrames: 9
+  recoveryFrames: 16
+  applyRootMotion: 0
+  forceGrounded: 0
+  rootMotionNode: 0
+  overrideBlendingIn: 1
+  overrideBlendingOut: 1
+  blendingIn: 0
+  blendingOut: 0.05
+  chargeMove: 0
+  chargeTiming: 0.7
+  allowInputLeniency: 0
+  allowNegativeEdge: 1
+  leniencyBuffer: 3
+  onReleaseExecution: 0
+  requireButtonPress: 1
+  onPressExecution: 1
+  buttonSequence: 
+  buttonExecution: 0500000008000000
+  previousMoves:
+  - {fileID: 11400000, guid: 1e2a8b47f933b5140b0768518aba4c6e, type: 2}
+  - {fileID: 11400000, guid: 8e23cf9dd45da914790c5868ff160de9, type: 2}
+  - {fileID: 11400000, guid: 8e23cf9dd45da914790c5868ff160de9, type: 2}
+  - {fileID: 11400000, guid: 057322634b0b3944d9bec735a6ef8b30, type: 2}
+  - {fileID: 11400000, guid: 319bc43b957082840bb410826a47b3d7, type: 2}
+  - {fileID: 11400000, guid: 3bfc5078b97f8834abb8fc0b398760d6, type: 2}
+  - {fileID: 11400000, guid: 3f96b2fe331a29342b33f4ce95202d03, type: 2}
+  - {fileID: 11400000, guid: f9b1bf4285a6db748a8aff5464ea52dc, type: 2}
+  - {fileID: 11400000, guid: c0e679bd555103e44b8f9ace48c3c694, type: 2}
+  - {fileID: 11400000, guid: 89ea6e81c61a27b4897b2324c98d77ca, type: 2}
+  - {fileID: 11400000, guid: 6ee33dede79882e4a82ff93165898ebc, type: 2}
+  - {fileID: 11400000, guid: 08549feac9ccb8d4696188e93f2c8c27, type: 2}
+  frameLinks:
+  - linkType: 2
+    allowBuffer: 0
+    onStrike: 0
+    onBlock: 0
+    onParry: 0
+    activeFramesBegins: 1
+    activeFramesEnds: 17
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 0
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: 6b788e8f1a339af48887aad58da2469b, type: 2}
+    - {fileID: 11400000, guid: 0d383081224494148b449dbf3f499c9f, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 1
+    counterMoveToggle: 0
+  - linkType: 2
+    allowBuffer: 0
+    onStrike: 0
+    onBlock: 0
+    onParry: 0
+    activeFramesBegins: 18
+    activeFramesEnds: 61
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 0
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: 0eef867f16ed593458181c9d6a81d6cb, type: 2}
+    - {fileID: 11400000, guid: 2cb276156ef8d0548ae1b04425420010, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 1
+    counterMoveToggle: 0
+  - linkType: 2
+    allowBuffer: 0
+    onStrike: 1
+    onBlock: 1
+    onParry: 1
+    activeFramesBegins: 63
+    activeFramesEnds: 64
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 1
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: cde1b4586af5185489c6d0d5f4807e79, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 0
+    counterMoveToggle: 0
+  - linkType: 2
+    allowBuffer: 0
+    onStrike: 1
+    onBlock: 1
+    onParry: 1
+    activeFramesBegins: 1
+    activeFramesEnds: 64
+    counterMoveType: 0
+    counterMoveFilter: {fileID: 0}
+    disableHitImpact: 1
+    anyHitStrength: 1
+    hitStrength: 0
+    anyStrokeHitBox: 1
+    hitBoxType: 0
+    anyHitType: 1
+    hitType: 0
+    ignoreInputs: 0
+    ignorePlayerConditions: 0
+    nextMoveStartupFrame: 1
+    linkableMoves:
+    - {fileID: 11400000, guid: 070d2de285e716648b4fa4654de69710, type: 2}
+    - {fileID: 11400000, guid: da720c94fed69b944b220e32c9a41996, type: 2}
+    linkableMovesToggle: 1
+    hitConfirmToggle: 0
+    counterMoveToggle: 0
+  particleEffects:
+  - castingFrame: 0
+    particleEffect:
+      editorToggle: 0
+      prefab: {fileID: 1246375075020920, guid: 539bc370b319b404d8b8dfd7285a4ecb, type: 2}
+      duration: 0.8
+      stick: 1
+      destroyOnMoveOver: 0
+      followRotation: 0
+      lockLocalPosition: 1
+      mirrorOn2PSide: 0
+      initialRotation: {x: 0, y: 0, z: 0}
+      positionOffSet: {x: 0, y: 0, z: 0}
+      bodyPart: 2
+  appliedForces:
+  - castingFrame: 0
+    resetPreviousVertical: 1
+    resetPreviousHorizontal: 1
+    force: {x: 0, y: -50}
+  slowMoEffects: []
+  bodyPartVisibilityChanges: []
+  opponentOverride: []
+  soundEffects:
+  - castingFrame: 0
+    sound: {fileID: 0}
+    sounds:
+    - {fileID: 8300000, guid: 4d403211f8809934dab7d665b461b0e4, type: 3}
+    soundEffectsToggle: 0
+  inGameAlert: []
+  stanceChanges: []
+  cameraMovements: []
+  hits: []
+  blockableArea:
+    activeFramesBegin: 1
+    activeFramesEnds: 31
+    bodyPart: 2
+    shape: 0
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 4
+      height: 4
+    followXBounds: 0
+    followYBounds: 0
+    radius: 6
+    offSet: {x: 0, y: 0}
+    position: {x: 0, y: 0, z: 0}
+  invincibleBodyParts: []
+  armorOptions:
+    activeFramesBegin: 1
+    activeFramesEnds: 64
+    overrideHitEffects: 0
+    hitEffects:
+      hitParticle: {fileID: 0}
+      killTime: 0
+      hitSound: {fileID: 0}
+      spawnPoint: 1
+      freezingTime: 0
+      animationSpeed: 0.1
+      autoHitStop: 1
+      hitStop: 0.1
+      shakeCharacterOnHit: 1
+      shakeCameraOnHit: 1
+      shakeDensity: 0.8
+      editorToggle: 0
+    hitAbsorption: 1
+    damageAbsorption: 0
+    nonAffectedBodyParts: 
+  projectiles: []
+  opponentConditions:
+    basicMoveLimitation: 
+    possibleMoveStates: []
+    basicMovesToggle: 0
+    statesToggle: 0
+  selfConditions:
+    basicMoveLimitation: 
+    possibleMoveStates:
+    - possibleState: 0
+      jumpArc: 0
+      jumpArcBegins: 0
+      jumpArcEnds: 100
+      opponentDistance: 0
+      proximityRangeBegins: 0
+      proximityRangeEnds: 100
+      movingForward: 1
+      movingBack: 1
+      standBy: 1
+      blocking: 0
+      stunned: 0
+      isCornor: 0
+    basicMovesToggle: 0
+    statesToggle: 0
+  moveClassification:
+    attackType: 5
+    hitType: 0
+    startupSpeed: 0
+    recoverySpeed: 0
+    hitConfirmType: 0
+    preferableDistance: 2
+    gaugeUsage: 3
+    anyAttackType: 1
+    anyHitType: 1
+    anyHitConfirmType: 1
+  speedKeyFrameToggle: 0

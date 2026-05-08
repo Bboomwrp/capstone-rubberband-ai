@@ -1,0 +1,94 @@
+# =========================================================
+# UNITY
+# =========================================================
+
+FightingGame/[Ll]ibrary/
+FightingGame/[Tt]emp/
+FightingGame/[Oo]bj/
+FightingGame/[Bb]uild/
+FightingGame/[Bb]uilds/
+FightingGame/[Ll]ogs/
+FightingGame/UserSettings/
+FightingGame/MemoryCaptures/
+FightingGame/Recordings/
+
+# Asset Store Tools
+FightingGame/Assets/AssetStoreTools*
+
+# Crash Reports
+FightingGame/sysinfo.txt
+
+# =========================================================
+# VISUAL STUDIO / RIDER
+# =========================================================
+
+.vs/
+.vscode/
+.idea/
+
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+
+# =========================================================
+# PYTHON
+# =========================================================
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+venv/
+env/
+ENV/
+
+.ipynb_checkpoints/
+
+# =========================================================
+# DATASET
+# =========================================================
+
+python/dataset/*.jsonl
+python/dataset/*.csv
+python/dataset/*.pkl
+
+# keep folder
+!python/dataset/.gitkeep
+
+# =========================================================
+# MODELS
+# =========================================================
+
+python/models/*.pth
+python/models/*.pt
+python/models/*.onnx
+
+# keep folder
+!python/models/.gitkeep
+
+# =========================================================
+# LOGS
+# =========================================================
+
+*.log
+
+# =========================================================
+# VS CODE
+# =========================================================
+
+.vscode/
+
+# =========================================================
+# OS
+# =========================================================
+
+.DS_Store
+Thumbs.db
