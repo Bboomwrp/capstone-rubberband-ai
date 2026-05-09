@@ -57,7 +57,7 @@ print(f"🔥 DEVICE: {DEVICE}")
 # LOAD MODEL
 # =========================================================
 
-model = DQN(6, len(ACTIONS)).to(DEVICE)
+model = DQN(9, len(ACTIONS)).to(DEVICE)
 
 model.load_state_dict(
     torch.load(MODEL_PATH, map_location=DEVICE)
@@ -110,9 +110,7 @@ def is_real_fight(state):
 
 def select_action(state, epsilon=0.05):
 
-    # =====================================================
-    # RANDOM EXPLORATION
-    # =====================================================
+    # RANDOM EXPLORATION 
 
     if random.random() < epsilon:
 
@@ -127,9 +125,7 @@ def select_action(state, epsilon=0.05):
 
         return action
 
-    # =====================================================
     # MODEL INFERENCE
-    # =====================================================
 
     state_vec = state_to_vector(state)
 
@@ -147,9 +143,7 @@ def select_action(state, epsilon=0.05):
 
     action = ACTIONS[action_idx]
 
-    # =====================================================
     # DEBUG
-    # =====================================================
 
     print(
         f"🧠 ACTION: {action} | "
@@ -158,13 +152,77 @@ def select_action(state, epsilon=0.05):
 
     return action
 
+def is_same_state(a, b):
+    return abs(a["p1_hp_ratio"] - b["p1_hp_ratio"]) < 1e-3 and \
+           abs(a["p2_hp_ratio"] - b["p2_hp_ratio"]) < 1e-3 and \
+           abs(a["time"] - b["time"]) < 1e-3
+
+def should_allow_boost(state):
+
+    p1_hp_ratio = state["p1_hp_ratio"]
+    p2_hp_ratio = state["p2_hp_ratio"]
+
+    hp_ratio_diff = abs(state["hp_ratio_diff"])
+
+    # =====================================================
+    # EARLY GAME
+    # =====================================================
+
+    if p1_hp_ratio > 0.90 and p2_hp_ratio > 0.90:
+        return False
+
+    # =====================================================
+    # CLOSE MATCH
+    # =====================================================
+
+    if hp_ratio_diff < 0.075:
+        return False
+
+    # =====================================================
+    # LOW HP FINISH
+    # =====================================================
+
+    if p1_hp_ratio < 0.10 and p2_hp_ratio < 0.10:
+        return False
+
+    return True
+
+# =========================================================
+# ADAPTIVE VALUE
+# =========================================================
+def get_boost_value(action, state):
+
+    hp_ratio_diff = abs(state["hp_ratio_diff"])
+
+    # Intensity
+    if hp_ratio_diff > 0.3:
+        intensity = 1.30
+    elif hp_ratio_diff > 0.2:
+        intensity = 1.20
+    elif hp_ratio_diff > 0.1:
+        intensity = 1.10
+    else:
+        intensity = 1.05
+
+    # ACTION TYPE ADJUSTMENT
+    if action == "BOOST_ATTACK":
+        return intensity
+    elif action == "BOOST_DEFENSE":
+        return min(intensity+0.05, 1.35)
+    elif action == "BOOST_GAUGE":
+        return min(intensity+0.1, 1.4)
+    
+    return 1.0
+
 # =========================================================
 # MAIN LOOP
 # =========================================================
 
 print("🚀 RL AGENT STARTED")
+write_action("NONE", 1.0)   
 
 last_action = None
+prev_state = None
 
 while True:
 
@@ -173,6 +231,18 @@ while True:
     if state is None:
         time.sleep(0.1)
         continue
+
+    # =====================================================
+    # Round Reset
+    # =====================================================
+
+    if prev_state is not None:
+        if state["time"] - prev_state["time"] > 0.5:
+            print("🔄 NEW ROUND DETECTED")
+
+            prev_state = None
+            last_action = None
+            continue
 
     # =====================================================
     # FILTER
@@ -186,9 +256,42 @@ while True:
         time.sleep(0.1)
         continue
 
+    if abs(state["hp_ratio_diff"]) < 1e-5 and state["p1_hp_ratio"] > 0.99 and state["p2_hp_ratio"] > 0.99:
+        time.sleep(0.1)
+        continue
+
+    # =====================================================
+    # Terminal
+    # =====================================================
+
+    if state["p1_hp_ratio"] <= 0 or state["p2_hp_ratio"] <= 0:
+
+        prev_state = None
+        last_action = None
+
+        time.sleep(0.5)
+        continue
+
+    # =====================================================
+    # Duplicate State
+    # =====================================================
+    if prev_state is not None and is_same_state(state, prev_state):
+        time.sleep(0.1)
+        continue
+ 
     # =====================================================
     # ACTION
     # =====================================================
+
+    if not should_allow_boost(state):
+
+        write_action("NONE", 1.0)
+
+        prev_state = state
+
+        time.sleep(0.5)
+
+        continue
 
     action = select_action(
         state,
@@ -199,16 +302,7 @@ while True:
     # ACTION VALUE
     # =====================================================
 
-    value = 1.0
-
-    if action == "BOOST_ATTACK":
-        value = 1.2
-
-    elif action == "BOOST_DEFENSE":
-        value = 1.15
-
-    elif action == "BOOST_GAUGE":
-        value = 1.25
+    value = get_boost_value(action, state)
 
     # =====================================================
     # ANTI-SPAM
@@ -225,12 +319,17 @@ while True:
 
     write_action(action, value)
 
-    print(f"⚡ WRITE ACTION: {action}")
+    print(f"⚡ WRITE ACTION: {action} x{value:.2f}")
 
+    time.sleep(1)
+
+    # Update last action and state
+    
     last_action = action
+    prev_state = state
 
     # =====================================================
     # LOOP DELAY
     # =====================================================
 
-    time.sleep(2.0)
+    # time.sleep(2.0)

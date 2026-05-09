@@ -59,6 +59,7 @@ ENV/
 python/dataset/*.jsonl
 python/dataset/*.csv
 python/dataset/*.pkl
+python/dataset/**/*.jsonl
 
 # keep folder
 !python/dataset/.gitkeep

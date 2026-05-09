@@ -7,6 +7,8 @@ public class RLStateExporter : MonoBehaviour
     private ControlsScript p1;
     private ControlsScript p2;
 
+    private RLActionReceiver actionReceiver;
+
     private string filePath;
 
     private bool matchStarted = false;
@@ -17,7 +19,6 @@ public class RLStateExporter : MonoBehaviour
     private float roundDuration = 99f;
 
     private bool isFighting = false;
-    private bool roundJustEnded = false;
     private bool doneSent = false;
 
     void OnEnable()
@@ -63,7 +64,13 @@ public class RLStateExporter : MonoBehaviour
     void OnRoundEnd(CharacterInfo winner, CharacterInfo loser)
     {
         isFighting = false;
-        roundJustEnded = true;
+
+        if (!doneSent)
+        {
+            ExportState(true);
+
+            doneSent = true;
+        }
 
         string winName = (winner != null) ? winner.characterName : "Unknown";
         Debug.Log("🟦 Round End: " + winName);
@@ -79,17 +86,7 @@ public class RLStateExporter : MonoBehaviour
             ExportState(true);
             doneSent = true;
 
-            Debug.Log("✅ DONE (HP KO DETECT)");
-            return;
-        }
-
-        if (roundJustEnded && !doneSent)
-        {
-            ExportState(true);
-            doneSent = true;
-            roundJustEnded = false;
-
-            Debug.Log("✅ DONE (EVENT)");
+            // Debug.Log("✅ DONE (HP KO DETECT)");
             return;
         }
 
@@ -98,6 +95,8 @@ public class RLStateExporter : MonoBehaviour
         if (Time.time - lastTime >= interval)
         {
             lastTime = Time.time;
+            if (!isFighting)
+                return;
             ExportState(false);
         }
 
@@ -106,20 +105,49 @@ public class RLStateExporter : MonoBehaviour
 
     void ExportState(bool doneFlag)
     {
-        float p1HP = p1.myInfo.currentLifePoints;
-        float p2HP = p2.myInfo.currentLifePoints;
-        float maxHP = Mathf.Max(p1.myInfo.lifePoints, p2.myInfo.lifePoints);
+        actionReceiver = FindObjectOfType<RLActionReceiver>();
 
-        if (p1HP <= 0 || p2HP <= 0)
+        string current_action;
+        bool is_boost_active;
+        if (actionReceiver != null)
         {
-            Debug.Log("⚠️ KO DETECTED | doneSent=" + doneSent + " | isFighting=" + isFighting);
+            current_action = actionReceiver.GetCurrentAction();
+
+            is_boost_active = actionReceiver.IsBoostActive();
+        }
+        else
+        {
+            current_action = "NONE";
+            is_boost_active = false;
         }
 
-        float hpDiff = (p1HP - p2HP) / maxHP;
-        float hpRatio = (p1HP + p2HP) / (2f * maxHP);
+        float p1MaxHP = p1.myInfo.lifePoints;
+        float p2MaxHP = p2.myInfo.lifePoints;
+        
+        float p1HP = p1.myInfo.currentLifePoints;
+        float p2HP = p2.myInfo.currentLifePoints;
+        
+        float p1HPRatio = p1HP / p1MaxHP;
+        float p2HPRatio = p2HP / p2MaxHP;
+
+        // if (p1HP <= 0 || p2HP <= 0)
+        // {
+        //     Debug.Log("⚠️ KO DETECTED | doneSent=" + doneSent + " | isFighting=" + isFighting);
+        // }
+
+        float hpRatioDiff = p1HPRatio - p2HPRatio;
 
         float p1Gauge = p1.myInfo.currentGaugePoints;
         float p2Gauge = p2.myInfo.currentGaugePoints;
+
+        float p1GaugeRatio = p1.myInfo.maxGaugePoints > 0 ? p1Gauge / p1.myInfo.maxGaugePoints : 0;
+        float p2GaugeRatio = p2.myInfo.maxGaugePoints > 0 ? p2Gauge / p2.myInfo.maxGaugePoints : 0;
+
+        float p1UltraGauge = p1.myInfo.currentUltraGaugePoints;
+        float p2UltraGauge = p2.myInfo.currentUltraGaugePoints;
+
+        float p1UltraGaugeRatio = p1.myInfo.maxUltraGauge > 0 ? p1UltraGauge / p1.myInfo.maxUltraGauge : 0;
+        float p2UltraGaugeRatio = p2.myInfo.maxUltraGauge > 0 ? p2UltraGauge / p2.myInfo.maxUltraGauge : 0;
 
         float distance = Mathf.Abs(
             p1.transform.position.x - p2.transform.position.x
@@ -134,12 +162,17 @@ public class RLStateExporter : MonoBehaviour
         bool isKO = p1HP <= 0 || p2HP <= 0;
 
         RLState state = new RLState();
-        state.hp_diff = hpDiff;
-        state.hp_ratio = hpRatio;
-        state.p1_hp = p1HP;
-        state.p2_hp = p2HP;
-        state.p1_gauge = p1Gauge;
-        state.p2_gauge = p2Gauge;
+        state.hp_ratio_diff = hpRatioDiff;
+        state.p1_hp_ratio = p1HPRatio;
+        state.p2_hp_ratio = p2HPRatio;
+        state.p1_gauge_ratio = p1GaugeRatio;
+        state.p2_gauge_ratio = p2GaugeRatio;
+        state.p1_ultra_gauge_ratio = p1UltraGaugeRatio;
+        state.p2_ultra_gauge_ratio = p2UltraGaugeRatio;
+        state.p1_character = p1.myInfo.characterName;
+        state.p2_character = p2.myInfo.characterName;
+        state.current_action = current_action;
+        state.is_boost_active = is_boost_active;
         state.distance = distance;
         state.time = timeRemaining;
         state.inMatch = isFighting;
@@ -172,16 +205,24 @@ public class RLState
 {
     public float time;
 
-    public float p1_hp;
-    public float p2_hp;
+    public float p1_hp_ratio;
+    public float p2_hp_ratio;
 
-    public float hp_diff;
-    public float hp_ratio;
+    public float hp_ratio_diff;
 
-    public float p1_gauge;
-    public float p2_gauge;
+    public float p1_gauge_ratio;
+    public float p2_gauge_ratio;
+
+    public float p1_ultra_gauge_ratio;
+    public float p2_ultra_gauge_ratio;
 
     public float distance;
+
+    public string current_action;
+    public bool is_boost_active;
+
+    public string p1_character;
+    public string p2_character;
 
     public bool inMatch;
 

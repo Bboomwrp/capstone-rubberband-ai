@@ -12,7 +12,7 @@ ACTION_FILE = os.path.join(BASE_PATH, "rl_action.json")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(BASE_DIR, "dataset")
 os.makedirs(DATASET_DIR, exist_ok=True)
-DATASET_FILE = os.path.join(DATASET_DIR, "dataset.jsonl")
+DATASET_FILE = os.path.join(DATASET_DIR, "dataset_v2.jsonl")
 
 def read_json(path):
     try:
@@ -30,134 +30,409 @@ def write_action(action, value):
         json.dump(data, f)
 
 def policy(state, epsilon=0.3):
-    actions = ["NONE", "BOOST_ATTACK", "BOOST_DEFENSE", "BOOST_GAUGE"]
 
-    # random exploration
-    if random.random() < epsilon:
-        return random.choice(actions), 1.0
+    actions = [
+        "NONE",
+        "BOOST_ATTACK",
+        "BOOST_DEFENSE",
+        "BOOST_GAUGE"
+    ]
 
-    hp_diff = abs(state["hp_diff"])
-    gauge_diff = state["p1_gauge"] - state["p2_gauge"]
+    p1_hp_ratio = state["p1_hp_ratio"]
+    p2_hp_ratio = state["p2_hp_ratio"]
 
-    # heuristic
-    if hp_diff > 0.2:
-        return "BOOST_ATTACK", 1.2
-    elif hp_diff > 0.1:
-        return "BOOST_DEFENSE", 1.1
-    elif gauge_diff < -200:
-        return "BOOST_GAUGE", 1.2
-    else:
+    hp_ratio_diff = abs(state["hp_ratio_diff"])
+
+    p1_gauge = state["p1_gauge_ratio"]
+    p2_gauge = state["p2_gauge_ratio"]
+
+    p1_ultra = state["p1_ultra_gauge_ratio"]
+    p2_ultra = state["p2_ultra_gauge_ratio"]
+
+    gauge_diff = p1_gauge - p2_gauge
+    ultra_diff = p1_ultra - p2_ultra
+
+    # CONSTRAINTS
+
+    # EARLY GAME
+    # no boost at full/opening HP
+
+    if p1_hp_ratio > 0.90 and p2_hp_ratio > 0.90:
         return "NONE", 1.0
 
+    # CLOSE MATCH
+    # no rubberband if nearly balanced
+
+    if hp_ratio_diff < 0.075:
+        return "NONE", 1.0
+
+    # CRITICAL FINISH
+    # let skill decide ending
+
+    if p1_hp_ratio < 0.10 and p2_hp_ratio < 0.10:
+        return "NONE", 1.0
+
+    # RANDOM EXPLORATION
+
+    if random.random() < epsilon:
+
+        action = random.choice(actions)
+
+        # adaptive random value
+        if hp_ratio_diff > 0.30:
+            value = 1.30
+        elif hp_ratio_diff > 0.20:
+            value = 1.20
+        elif hp_ratio_diff > 0.10:
+            value = 1.10
+        else:
+            value = 1.05
+
+        return action, value
+
+    # HEURISTIC POLICY
+
+    # HEAVY DISADVANTAGE
+    # prioritize comeback damage
+
+    if hp_ratio_diff > 0.30:
+        return "BOOST_ATTACK", 1.30
+
+    # MEDIUM DISADVANTAGE
+    # defensive stabilization
+
+    elif hp_ratio_diff > 0.18:
+        return "BOOST_DEFENSE", 1.20
+
+    # RESOURCE DISADVANTAGE
+    # encourage meter comeback
+
+    elif gauge_diff < -0.25 or ultra_diff < -0.25:
+        return "BOOST_GAUGE", 1.25
+
+    # LIGHT DISADVANTAGE
+    # smaller offensive momentum
+
+    elif hp_ratio_diff > 0.10:
+        return "BOOST_ATTACK", 1.10
+
+    # OTHERWISE
+    return "NONE", 1.0
+
 def compute_reward(state, next_state):
+
     reward = 0.0
 
-    # =========================
-    # 1. DAMAGE (หลัก)
-    # =========================
-    p1_loss = state["p1_hp"] - next_state["p1_hp"]
-    p2_loss = state["p2_hp"] - next_state["p2_hp"]
+    # =====================================================
+    # 1. DAMAGE REWARD
+    # =====================================================
 
+    p1_loss = (
+        state["p1_hp_ratio"]
+        - next_state["p1_hp_ratio"]
+    )
+
+    p2_loss = (
+        state["p2_hp_ratio"]
+        - next_state["p2_hp_ratio"]
+    )
+
+    # symmetric net damage
     net_damage = p2_loss - p1_loss
-    reward += net_damage * 1.0
 
-    # =========================
-    # 2. COMEBACK (rubberband)
-    # =========================
-    prev_diff = abs(state["hp_diff"])
-    next_diff = abs(next_state["hp_diff"])
+    reward += net_damage * 2.0
 
-    # ถ้าความห่างลดลง = เกมสูสีขึ้น → ดี
-    if next_diff < prev_diff:
-        reward += (prev_diff - next_diff) * 50.0
+    # =====================================================
+    # 2. COMEBACK REWARD
+    # =====================================================
 
-    # =========================
-    # 3. SURVIVAL (กันตายโง่)
-    # =========================
-    if state["hp_diff"] < 0:
-        # p1 เสียเปรียบ → โดนตีแรง = โดนลงโทษ
-        reward -= p1_loss * 0.5
+    prev_gap = abs(state["hp_ratio_diff"])
+    next_gap = abs(next_state["hp_ratio_diff"])
+
+    # encourage closer matches
+    if next_gap < prev_gap:
+
+        comeback_gain = prev_gap - next_gap
+
+        reward += comeback_gain * 2.5
+
+    # discourage snowball
     else:
-        # p2 เสียเปรียบ → โดนตีแรง = ดี
-        reward += p2_loss * 0.3
 
-    # =========================
-    # 4. GAUGE (resource)
-    # =========================
-    p1_gain = next_state["p1_gauge"] - state["p1_gauge"]
-    p2_gain = next_state["p2_gauge"] - state["p2_gauge"]
+        snowball = next_gap - prev_gap
 
-    # rubberband-aware
-    if state["hp_diff"] < 0:
-        reward += p1_gain * 0.1
+        reward -= snowball * 1.5
+
+    # =====================================================
+    # 3. SURVIVAL REWARD
+    # =====================================================
+
+    # identify disadvantaged side
+    if state["hp_ratio_diff"] < 0:
+        # P1 behind
+        reward += (-p1_loss) * 1.0
+
     else:
-        reward += p2_gain * 0.1
+        # P2 behind
+        reward += (-p2_loss) * 1.0
 
-    # =========================
-    # 5. STABILITY (กันมั่ว)
-    # =========================
-    # ถ้า HP เปลี่ยนเยอะผิดปกติ → penalty
-    if abs(p1_loss) > 200 or abs(p2_loss) > 200:
-        reward -= 10.0
+    # =====================================================
+    # 4. RESOURCE REWARD
+    # =====================================================
 
-    # =========================
-    # 6. TERMINAL (จบ round)
-    # =========================
+    p1_resource_gain = (
+        (next_state["p1_gauge_ratio"]
+         - state["p1_gauge_ratio"])
+
+        +
+
+        (next_state["p1_ultra_gauge_ratio"]
+         - state["p1_ultra_gauge_ratio"])
+    )
+
+    p2_resource_gain = (
+        (next_state["p2_gauge_ratio"]
+         - state["p2_gauge_ratio"])
+
+        +
+
+        (next_state["p2_ultra_gauge_ratio"]
+         - state["p2_ultra_gauge_ratio"])
+    )
+
+    # reward disadvantaged side gaining resources
+    if state["hp_ratio_diff"] < 0:
+
+        reward += p1_resource_gain * 1.5
+
+    else:
+
+        reward += p2_resource_gain * 1.5
+
+    # =====================================================
+    # 5. STABILITY PENALTY
+    # =====================================================
+
+    # abnormal sudden transitions
+    if abs(p1_loss) > 0.40 or abs(p2_loss) > 0.40:
+
+        reward -= 3.0
+
+    # excessive gap
+    if next_gap > 0.60:
+
+        reward -= 2.0
+
+    # =====================================================
+    # 6. TERMINAL REWARD
+    # =====================================================
+
     if next_state.get("done", False):
-        if next_state["p1_hp"] <= 0:
-            reward -= 100.0
-        elif next_state["p2_hp"] <= 0:
-            reward += 100.0
 
-    reward = reward / 100.0
-    reward = max(min(reward, 1.0), -1.0)
+        # perfectly symmetric terminal reward
+
+        if next_state["p1_hp_ratio"] <= 0:
+
+            reward -= 5.0
+
+        elif next_state["p2_hp_ratio"] <= 0:
+
+            reward += 5.0
+
+    # =====================================================
+    # NORMALIZATION
+    # =====================================================
+
+    reward = max(min(reward, 10.0), -10.0)
+
+    reward = reward / 10.0
 
     return reward
 
-def save_dataset(prev, action, reward, curr):
-    data = {
-        "state": prev,
+def save_dataset(prev, action, action_value, reward, curr):
+
+    global SAMPLE_ID
+    global ROUND_ID
+
+    SAMPLE_ID += 1
+
+    # =====================================================
+    # CHARACTER INFO
+    # =====================================================
+
+    p1_character = prev.get(
+        "p1_character",
+        "unknown"
+    ).lower()
+
+    p2_character = prev.get(
+        "p2_character",
+        "unknown"
+    ).lower()
+
+    # =====================================================
+    # MATCHUP
+    # =====================================================
+
+    matchup = (
+        p1_character
+        + "_vs_"
+        + p2_character
+    )
+
+    # =====================================================
+    # METADATA
+    # =====================================================
+
+    metadata = {
+
+        "dataset_version": "v2",
+        # ---------------------------------------------
+        # dataset indexing
+        # ---------------------------------------------
+
+        "sample_id": SAMPLE_ID,
+
+        "round_id": ROUND_ID,
+
+        # ---------------------------------------------
+        # matchup info
+        # ---------------------------------------------
+
+        "matchup": matchup,
+
+        "p1_character": p1_character,
+
+        "p2_character": p2_character,
+
+        # ---------------------------------------------
+        # timestamp
+        # ---------------------------------------------
+
+        "timestamp": time.time(),
+
+        # ---------------------------------------------
+        # gameplay context
+        # ---------------------------------------------
+
         "action": action,
+
+        "action_value": action_value,
+
         "reward": reward,
+
+        # ---------------------------------------------
+        # state transition
+        # ---------------------------------------------
+
+        "state": prev,
+
         "next_state": curr
     }
 
+    # =====================================================
+    # SAVE
+    # =====================================================
+
     with open(DATASET_FILE, "a") as f:
-        f.write(json.dumps(data) + "\n")
+
+        f.write(
+            json.dumps(metadata)
+            + "\n"
+        )
+
+def load_dataset_metadata():
+
+    if not os.path.exists(DATASET_FILE):
+
+        return 1, 0
+
+    try:
+
+        with open(DATASET_FILE, "r") as f:
+
+            lines = f.readlines()
+
+            if len(lines) == 0:
+                return 1, 0
+
+            last_entry = json.loads(lines[-1])
+
+            last_round_id = last_entry.get(
+                "round_id",
+                0
+            )
+
+            last_sample_id = last_entry.get(
+                "sample_id",
+                0
+            )
+
+            return (
+                last_round_id + 1,
+                last_sample_id
+            )
+
+    except Exception as e:
+
+        print(f"⚠ Failed to load dataset metadata: {e}")
+
+        return 1, 0
 
 def is_real_fight(state):
-    return state["time"] < 0.99
+    if state.get("inMatch", False) is False:
+        return False
+    
+    if state.get("time", 1.0) >= 0.99:
+        return False
+    return True
 
 def is_terminal(prev, curr):
     if prev is None or curr is None:
         return False
 
-    p1_dead = prev["p1_hp"] > 0 and curr["p1_hp"] <= 0
-    p2_dead = prev["p2_hp"] > 0 and curr["p2_hp"] <= 0
+    p1_dead = prev["p1_hp_ratio"] > 0 and curr["p1_hp_ratio"] <= 0
+    p2_dead = prev["p2_hp_ratio"] > 0 and curr["p2_hp_ratio"] <= 0
 
     return p1_dead or p2_dead
 
 def make_signature(prev, curr):
     return (
-        round(prev["p1_hp"], 3),
-        round(prev["p2_hp"], 3),
-        round(curr["p1_hp"], 3),
-        round(curr["p2_hp"], 3)
+        round(prev["p1_hp_ratio"], 3),
+        round(prev["p2_hp_ratio"], 3),
+        round(curr["p1_hp_ratio"], 3),
+        round(curr["p2_hp_ratio"], 3)
     )
 
 def is_same_state(a, b):
-    return abs(a["p1_hp"] - b["p1_hp"]) < 1e-3 and \
-           abs(a["p2_hp"] - b["p2_hp"]) < 1e-3 and \
+    return abs(a["p1_hp_ratio"] - b["p1_hp_ratio"]) < 1e-3 and \
+           abs(a["p2_hp_ratio"] - b["p2_hp_ratio"]) < 1e-3 and \
            abs(a["time"] - b["time"]) < 1e-3
+
+# =====================================================
+# METADATA
+# =====================================================
+
+ROUND_ID, SAMPLE_ID = load_dataset_metadata()
+
+print(f"📂 RESUME ROUND_ID: {ROUND_ID}")
+print(f"📂 RESUME SAMPLE_ID: {SAMPLE_ID}")
+
 
 # ================= LOOP =================
 
 print("🤖 RL Agent started")
 
+write_action("NONE", 1.0)
+
 prev_state = None
 last_done = False
 episode_done = False
 last_terminal_signature = None
+startup_synced = False
+last_seen_time = None
+stable_updates = 0
+last_action_time = 0
 
 while True:
     state = read_json(STATE_FILE)
@@ -166,10 +441,63 @@ while True:
         time.sleep(0.1)
         continue
 
+    # =====================================================
+    # STARTUP SYNC
+    # wait for fresh realtime state
+    # =====================================================
+
+    if not startup_synced:
+
+        if not state.get("inMatch", False):
+
+            time.sleep(0.2)
+            continue
+
+        current_time = state.get("time", None)
+
+        if current_time is None:
+            time.sleep(0.1)
+            continue
+
+        if last_seen_time is None:
+
+            last_seen_time = current_time
+
+            time.sleep(0.2)
+
+            continue
+
+        # realtime countdown detected
+        if current_time < last_seen_time:
+
+            stable_updates += 1
+
+        last_seen_time = current_time
+
+        # require only 2 valid updates
+        if stable_updates < 2:
+
+            time.sleep(0.2)
+
+            continue
+
+        startup_synced = True
+
+        print("✅ STARTUP SYNCED")
+
+        write_action("NONE", 1.0)
+
+        time.sleep(0.5)
+
+        continue
+
     # ================= ROUND RESET =================
     if prev_state is not None:
         if state["time"] - prev_state["time"] > 0.5:
             print("🔄 NEW ROUND DETECTED")
+
+            ROUND_ID += 1
+            print(f"🎮 ROUND ID: {ROUND_ID}")
 
             episode_done = False
             prev_state = None
@@ -188,17 +516,20 @@ while True:
 
     # ================= FILTER PREVIEW =================
     if state.get("time", 1.0) >= 0.99:
+        time.sleep(0.1)
         continue
 
     # skip full HP (ยังไม่เริ่มสู้)
-    if abs(state["hp_diff"]) < 1e-5 and state["hp_ratio"] > 0.99:
+    if abs(state["hp_ratio_diff"]) < 1e-5 and state["p1_hp_ratio"] > 0.99 and state["p2_hp_ratio"] > 0.99:
+        time.sleep(0.1)
         continue
 
     if not is_real_fight(state):
+        time.sleep(0.1)
         continue
 
     # ================= TERMINAL FLAG =================
-    if state["p1_hp"] <= 0 or state["p2_hp"] <= 0:
+    if state["p1_hp_ratio"] <= 0 or state["p2_hp_ratio"] <= 0:
         state["done"] = True
 
     # ❗ กัน terminal state หลุดเข้า logic
@@ -230,7 +561,7 @@ while True:
             state["done"] = True
 
             reward = compute_reward(prev_state, state)
-            save_dataset(prev_state, "NONE", reward, state)
+            save_dataset(prev_state, "NONE", 1.0, reward, state)
 
             print("🏁 TERMINAL SAVED")
 
@@ -244,15 +575,56 @@ while True:
         continue
 
     # ================= ACTION =================
+    if time.time() - last_action_time < 5.0:
+        time.sleep(0.2)
+        continue
+    
     action, value = policy(state)
-    write_action(action, value)
+    
+    if action == "NONE":
 
-    time.sleep(1)
+        write_action("NONE", 1.0)
+
+        prev_state = state
+
+        time.sleep(0.5)
+
+        continue
+    
+    write_action(action, value)
+    last_action_time = time.time()
+
+    time.sleep(3.0)
 
     next_state = read_json(STATE_FILE)
+    
+    # invalid transition
     if next_state is None:
         continue
+    
+    if is_same_state(state, next_state):
 
+        print("⚠ SAME STATE TRANSITION")
+
+        prev_state = next_state
+
+        continue
+    
+    # action rejected by Unity
+    if next_state.get("current_action", "NONE") != action:
+
+        print("⚠ ACTION NOT APPLIED")
+
+        prev_state = next_state
+
+        continue
+    if not next_state.get("is_boost_active", False):
+
+        print("⚠ BOOST NOT ACTIVE")
+
+        prev_state = next_state
+
+        continue
     # ================= VALIDATE NEXT STATE =================
     if next_state.get("time", 1.0) >= 0.99:
         continue
@@ -262,7 +634,7 @@ while True:
         continue
 
     # mark done
-    if next_state["p1_hp"] <= 0 or next_state["p2_hp"] <= 0:
+    if next_state["p1_hp_ratio"] <= 0 or next_state["p2_hp_ratio"] <= 0:
         next_state["done"] = True
 
     # ❗ กัน terminal ซ้ำใน normal flow
@@ -271,9 +643,9 @@ while True:
 
     # ================= SAVE NORMAL =================
     reward = compute_reward(state, next_state)
-    save_dataset(state, action, reward, next_state)
+    save_dataset(state, action, value, reward, next_state)
 
     print(f"📊 {action} | reward: {reward:.4f}")
 
     # ================= UPDATE =================
-    prev_state = state
+    prev_state = next_state

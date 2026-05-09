@@ -1,0 +1,26 @@
+flowchart LR
+
+    A[Unity Fighting Game] --> B[RLStateExporter]
+
+    B --> C[Game State JSON]
+
+    C --> D[Dataset Collection]
+
+    D --> E[Dataset Cleaning]
+
+    E --> F[Reward Normalization]
+
+    F --> G[DQN Training]
+
+    G --> H[Trained DQN Model]
+
+    H --> I[RL Agent Inference]
+
+    I --> J[Action Selection]
+
+    J --> K[RLActionReceiver]
+
+    K --> L[Adaptive Stat Boost]
+
+    L --> A
+

@@ -1,0 +1,22 @@
+flowchart LR
+
+    A[Game State]
+
+    A --> B[Damage Analysis]
+    A --> C[Comeback Detection]
+    A --> D[Survival Evaluation]
+    A --> E[Gauge Evaluation]
+    A --> F[Stability Check]
+    A --> G[Terminal State]
+
+    B --> H[Reward Function]
+    C --> H
+    D --> H
+    E --> H
+    F --> H
+    G --> H
+
+    H --> I[Normalize & Clip]
+
+    I --> J[DQN Training]
+

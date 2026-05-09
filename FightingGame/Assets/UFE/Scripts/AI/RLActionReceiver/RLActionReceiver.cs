@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.IO;
+using UnityEngine.UI;
 
 public class RLActionReceiver : MonoBehaviour
 {
@@ -12,8 +13,8 @@ public class RLActionReceiver : MonoBehaviour
     private float checkInterval = 1f;
     private float lastCheckTime = 0f;
 
-    private float boostDuration = 2f;
-    private float cooldownDuration = 1f;
+    private float boostDuration = 5f;
+    private float cooldownDuration = 3f;
 
     private float boostTimer = 0f;
     private float cooldownTimer = 0f;
@@ -24,6 +25,11 @@ public class RLActionReceiver : MonoBehaviour
 
     private bool cooldownLogged = false;
     private bool boostLogged = false;
+
+    private ControlsScript boostedTarget;
+
+    public Text p1BoostText;
+    public Text p2BoostText;
 
     void Start()
     {
@@ -78,6 +84,7 @@ public class RLActionReceiver : MonoBehaviour
         cooldownTimer = 0f;
 
         ResetAll();
+        ResetActionFile();
 
         Debug.Log("🔥 ROUND START");
     }
@@ -95,6 +102,7 @@ public class RLActionReceiver : MonoBehaviour
         cooldownTimer = 0f;
 
         ResetAll();
+        ResetActionFile();
 
         Debug.Log("🛑 ROUND END → RL disabled");
     }
@@ -110,6 +118,7 @@ public class RLActionReceiver : MonoBehaviour
         p2 = null;
 
         ResetAll();
+        ResetActionFile();
     }
 
     void Update()
@@ -125,6 +134,21 @@ public class RLActionReceiver : MonoBehaviour
         if (boostTimer > 0)
         {
             boostTimer -= Time.deltaTime;
+
+            if (ShouldCancelBoost())
+            {
+                Debug.Log("🛑 BOOST CANCELLED");
+
+                ResetAll();
+
+                boostTimer = 0f;
+
+                cooldownTimer = cooldownDuration;
+
+                currentAction = "NONE";
+
+                return;
+            }
 
             if (!boostLogged)
             {
@@ -287,7 +311,10 @@ public class RLActionReceiver : MonoBehaviour
 
         currentAction = action.action;
 
-        boostTimer = boostDuration;
+        if (action.action != "NONE")
+        {
+            boostTimer = boostDuration;
+        }
 
         Debug.Log(
             "✅ BOOST STARTED | Duration: " +
@@ -302,23 +329,53 @@ public class RLActionReceiver : MonoBehaviour
 
         // เลือกฝั่งที่เสียเปรียบ
         ControlsScript target = (p1HP < p2HP) ? p1 : p2;
-
-        float value = Mathf.Clamp(action.value, 0.8f, 1.3f);
+        boostedTarget = target;
+        float value = Mathf.Clamp(action.value, 0.8f, 1.4f);
 
         if (action.action == "BOOST_ATTACK")
         {
             target.attackMultiplier = value;
-            Debug.Log("🔥 BOOST_ATTACK → P" + target.playerNum + " x" + value);
+            ShowBoostUI(
+                target,
+                "BOOST ATK",
+                Color.red
+            );
+            Debug.Log(
+                "🔥 BOOST_ATTACK → P" +
+                target.playerNum +
+                " | value=" + value +
+                " | actual=" + target.attackMultiplier
+            );
         }
         else if (action.action == "BOOST_DEFENSE")
         {
             target.defenseMultiplier = value;
-            Debug.Log("🛡 BOOST_DEFENSE → P" + target.playerNum + " x" + value);
+            ShowBoostUI(
+                target,
+                "BOOST DEF",
+                Color.green
+            );
+            Debug.Log(
+                "🛡 BOOST_DEFENSE → P" +
+                target.playerNum +
+                " | value=" + value +
+                " | actual=" + target.defenseMultiplier
+            );
         }
         else if (action.action == "BOOST_GAUGE")
         {
             target.gaugeGainMultiplier = value;
-            Debug.Log("⚡ BOOST_GAUGE → P" + target.playerNum + " x" + value);
+            ShowBoostUI(
+                target,
+                "BOOST GAUGE",
+                Color.cyan
+            );
+            Debug.Log(
+                "⚡ BOOST_GAUGE → P" +
+                target.playerNum +
+                " | value=" + value +
+                " | actual=" + target.gaugeGainMultiplier
+            );
         }
         else if (action.action == "NONE")
         {
@@ -342,7 +399,140 @@ public class RLActionReceiver : MonoBehaviour
             p2.gaugeGainMultiplier = 1f;
         }
 
+        boostedTarget = null;
+
         Debug.Log("🔄 Reset multipliers");
+    }
+
+    void ResetActionFile()
+    {
+        RLAction resetAction = new RLAction();
+
+        resetAction.action = "NONE";
+        resetAction.value = 1.0f;
+
+        string json = JsonUtility.ToJson(resetAction);
+
+        try
+        {
+            File.WriteAllText(actionPath, json);
+
+            Debug.Log("🧹 Reset rl_action.json");
+        }
+        catch
+        {
+            Debug.LogWarning("⚠ Cannot reset action file");
+        }
+    }
+
+    bool ShouldCancelBoost()
+    {
+        if (p1 == null || p2 == null)
+            return false;
+
+        float p1HP =
+            p1.myInfo.currentLifePoints /
+            p1.myInfo.lifePoints;
+
+        float p2HP =
+            p2.myInfo.currentLifePoints /
+            p2.myInfo.lifePoints;
+
+        float hpDiff = Mathf.Abs(p1HP - p2HP);
+
+        // CLOSE MATCH
+
+        if (hpDiff < 0.075f)
+        {
+            Debug.Log("⚖ CLOSE MATCH → CANCEL BOOST");
+            return true;
+        }
+
+        // LOW HP FINISH
+
+        if (p1HP < 0.10f && p2HP < 0.10f)
+        {
+            Debug.Log("🏁 LOW HP FINISH → CANCEL BOOST");
+            return true;
+        }
+
+        // EARLY GAME
+
+        if (p1HP > 0.90f && p2HP > 0.90f)
+        {
+            Debug.Log("🚫 EARLY GAME → CANCEL BOOST");
+            return true;
+        }
+
+        // TARGET NOW WINNING
+
+        ControlsScript boosted =
+            GetCurrentlyBoostedPlayer();
+
+        if (boosted != null)
+        {
+            bool p1Boosted =
+                boosted.playerNum == 1;
+
+            // boosted player now leading
+            if (p1Boosted && p1HP > p2HP)
+            {
+                Debug.Log("🔄 P1 RECOVERED → CANCEL BOOST");
+                return true;
+            }
+
+            if (!p1Boosted && p2HP > p1HP)
+            {
+                Debug.Log("🔄 P2 RECOVERED → CANCEL BOOST");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void ShowBoostUI(
+        ControlsScript target,
+        string text,
+        Color color
+    )
+    {
+        Text ui =
+            (target.playerNum == 1)
+            ? p1BoostText
+            : p2BoostText;
+
+        ui.text = text;
+        ui.color = color;
+
+        ui.gameObject.SetActive(true);
+
+        StartCoroutine(HideBoostUI(ui));
+    }
+
+    ControlsScript GetCurrentlyBoostedPlayer()
+    {
+        if (boostedTarget == null)
+            return null;
+
+        return boostedTarget;
+    }
+
+    public string GetCurrentAction()
+    {
+        return currentAction;
+    }
+
+    public bool IsBoostActive()
+    {
+        return boostTimer > 0f;
+    }
+
+    IEnumerator HideBoostUI(Text ui)
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        ui.gameObject.SetActive(false);
     }
 
     [System.Serializable]

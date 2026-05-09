@@ -134,7 +134,6 @@ Gameplay
 ## Authors
 
 - "Weeraphat Plengudomkij"
-- "Kaj Ruanglertmaneepong"
 
 CEDT Capstone Project  
 Chulalongkorn University
