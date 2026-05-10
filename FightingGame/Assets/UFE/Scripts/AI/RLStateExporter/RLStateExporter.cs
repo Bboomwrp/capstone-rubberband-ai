@@ -15,8 +15,6 @@ public class RLStateExporter : MonoBehaviour
 
     private float interval = 1f;
     private float lastTime = 0f;
-    private float roundStartTime;
-    private float roundDuration = 99f;
 
     private bool isFighting = false;
     private bool doneSent = false;
@@ -42,8 +40,6 @@ public class RLStateExporter : MonoBehaviour
         p1 = UFE.GetControlsScript(1);
         p2 = UFE.GetControlsScript(2);
 
-        roundStartTime=Time.time;
-
         filePath = Application.persistentDataPath + "/rl_state.json";
 
         Debug.Log("🧠 RLStateExporter Started: " + filePath);
@@ -55,7 +51,6 @@ public class RLStateExporter : MonoBehaviour
     void OnRoundBegin(int round)
     {
         isFighting = true;
-        roundStartTime = Time.time;
         doneSent = false;
 
         Debug.Log("🔥 Round Started: " + round);

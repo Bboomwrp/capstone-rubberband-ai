@@ -82,16 +82,31 @@ def read_json(path):
 
 def write_action(action, value):
 
-    data = {
+    payload = {
         "action": action,
         "value": value
     }
 
-    try:
-        with open(ACTION_FILE, "w") as f:
-            json.dump(data, f)
-    except:
-        print("⚠ Cannot write action")
+    for attempt in range(5):
+
+        try:
+
+            with open(ACTION_FILE, "w") as f:
+
+                json.dump(payload, f)
+
+            return
+
+        except PermissionError:
+
+            print(
+                f"⚠ ACTION FILE LOCKED "
+                f"(attempt {attempt+1})"
+            )
+
+            time.sleep(0.05)
+
+    print("❌ FAILED TO WRITE ACTION")
 
 
 def is_real_fight(state):
@@ -219,68 +234,157 @@ def get_boost_value(action, state):
 # =========================================================
 
 print("🚀 RL AGENT STARTED")
-write_action("NONE", 1.0)   
 
-last_action = None
+write_action("NONE", 1.0)
+
 prev_state = None
+startup_synced = False
+episode_done = False
 
 while True:
 
     state = read_json(STATE_FILE)
 
     if state is None:
+
         time.sleep(0.1)
+
         continue
 
     # =====================================================
-    # Round Reset
+    # TERMINAL DETECTION (HIGHEST PRIORITY)
     # =====================================================
 
-    if prev_state is not None:
-        if state["time"] - prev_state["time"] > 0.5:
-            print("🔄 NEW ROUND DETECTED")
+    if state.get("done", False):
 
-            prev_state = None
-            last_action = None
+        print("🏁 TERMINAL")
+
+        write_action("NONE", 1.0)
+
+        prev_state = None
+        startup_synced = False
+        episode_done = True
+
+        time.sleep(1.0)
+
+        continue
+
+    # =====================================================
+    # RESET ACTION OUTSIDE MATCH
+    # =====================================================
+
+    if not state.get("inMatch", False):
+
+        write_action("NONE", 1.0)
+
+        prev_state = None
+
+        time.sleep(0.1)
+
+        continue
+
+    # =====================================================
+    # STARTUP SYNC
+    # =====================================================
+
+    if not startup_synced:
+
+        # wait until gameplay actually begins
+        if state.get("time", 1.0) > 0.995:
+
+            time.sleep(0.05)
+
+            continue
+
+        startup_synced = True
+
+        episode_done = False
+
+        print("✅ STARTUP SYNCED")
+
+        write_action("NONE", 1.0)
+
+        prev_state = state
+
+        continue
+
+    # =====================================================
+    # WAIT NEXT ROUND AFTER TERMINAL
+    # =====================================================
+
+    if episode_done:
+
+        if (
+            state.get("inMatch", False)
+            and
+            state.get("time", 1.0) < 0.95
+        ):
+
+            episode_done = False
+
+        else:
+
+            time.sleep(0.1)
+
             continue
 
     # =====================================================
-    # FILTER
+    # PREVIEW / READY FILTER
     # =====================================================
 
-    if not is_real_fight(state):
+    if state.get("time", 1.0) >= 0.99:
+
         time.sleep(0.1)
+
         continue
 
-    if state.get("done", False):
+    # =====================================================
+    # FULL HP OPENING FILTER
+    # =====================================================
+
+    if (
+        abs(state["hp_ratio_diff"]) < 1e-5
+        and
+        state["p1_hp_ratio"] > 0.99
+        and
+        state["p2_hp_ratio"] > 0.99
+    ):
+
         time.sleep(0.1)
-        continue
 
-    if abs(state["hp_ratio_diff"]) < 1e-5 and state["p1_hp_ratio"] > 0.99 and state["p2_hp_ratio"] > 0.99:
-        time.sleep(0.1)
         continue
 
     # =====================================================
-    # Terminal
+    # DUPLICATE STATE FILTER
     # =====================================================
 
-    if state["p1_hp_ratio"] <= 0 or state["p2_hp_ratio"] <= 0:
+    if prev_state is not None:
 
-        prev_state = None
-        last_action = None
+        if is_same_state(state, prev_state):
 
-        time.sleep(0.5)
+            time.sleep(0.1)
+
+            continue
+
+    # =====================================================
+    # OBSERVE ACTIVE BOOST
+    # =====================================================
+
+    if state.get("is_boost_active", False):
+
+        print(
+            f"👀 OBSERVING BOOST: "
+            f"{state.get('current_action', 'NONE')}"
+        )
+
+        prev_state = state
+
+        time.sleep(0.3)
+
         continue
 
     # =====================================================
-    # Duplicate State
-    # =====================================================
-    if prev_state is not None and is_same_state(state, prev_state):
-        time.sleep(0.1)
-        continue
- 
-    # =====================================================
-    # ACTION
+    # BOOST CONSTRAINTS
     # =====================================================
 
     if not should_allow_boost(state):
@@ -289,9 +393,13 @@ while True:
 
         prev_state = state
 
-        time.sleep(0.5)
+        time.sleep(0.3)
 
         continue
+
+    # =====================================================
+    # MODEL ACTION
+    # =====================================================
 
     action = select_action(
         state,
@@ -299,37 +407,106 @@ while True:
     )
 
     # =====================================================
-    # ACTION VALUE
+    # VALUE
     # =====================================================
 
-    value = get_boost_value(action, state)
+    value = get_boost_value(
+        action,
+        state
+    )
 
     # =====================================================
-    # ANTI-SPAM
+    # NO BOOST
     # =====================================================
 
-    if action == last_action:
+    if action == "NONE":
 
-        time.sleep(1.0)
+        write_action("NONE", 1.0)
+
+        prev_state = state
+
+        time.sleep(0.3)
+
         continue
 
     # =====================================================
-    # WRITE
+    # WRITE ACTION
     # =====================================================
 
     write_action(action, value)
 
-    print(f"⚡ WRITE ACTION: {action} x{value:.2f}")
-
-    time.sleep(1)
-
-    # Update last action and state
-    
-    last_action = action
-    prev_state = state
+    print(
+        f"⚡ WRITE ACTION: "
+        f"{action} x{value:.2f}"
+    )
 
     # =====================================================
-    # LOOP DELAY
+    # WAIT UNITY APPLY
     # =====================================================
 
-    # time.sleep(2.0)
+    time.sleep(0.8)
+
+    next_state = read_json(STATE_FILE)
+
+    if next_state is None:
+
+        continue
+
+    # =====================================================
+    # INVALID TRANSITION
+    # =====================================================
+
+    if is_same_state(state, next_state):
+
+        print("⚠ SAME STATE TRANSITION")
+
+        prev_state = state
+
+        continue
+
+    # =====================================================
+    # ACTION VALIDATION
+    # =====================================================
+
+    if next_state.get("current_action", "NONE") != action:
+
+        print("⚠ ACTION NOT APPLIED")
+
+        prev_state = state
+
+        continue
+
+    # =====================================================
+    # BOOST VALIDATION
+    # =====================================================
+
+    if not next_state.get("is_boost_active", False):
+
+        print("⚠ BOOST NOT ACTIVE")
+
+        prev_state = state
+
+        continue
+
+    # =====================================================
+    # ROUND SAFETY
+    # =====================================================
+
+    if next_state.get("time", 1.0) >= 0.99:
+
+        continue
+
+    if next_state["time"] > state["time"]:
+
+        continue
+
+    # =====================================================
+    # SUCCESS
+    # =====================================================
+
+    print(
+        f"✅ BOOST APPLIED: "
+        f"{action} x{value:.2f}"
+    )
+
+    prev_state = next_state

@@ -1,17 +1,40 @@
 def state_to_vector(state):
 
     return [
-        state["p1_hp_ratio"],
-        state["p2_hp_ratio"],
 
-        state["hp_ratio_diff"],
+        # =================================================
+        # HP
+        # =================================================
 
-        state["p1_gauge_ratio"],
-        state["p2_gauge_ratio"],
+        state.get("p1_hp_ratio", 0.0),
+        state.get("p2_hp_ratio", 0.0),
 
-        state["p1_ultra_ratio"],
-        state["p2_ultra_ratio"],
+        # signed diff
+        state.get("hp_ratio_diff", 0.0),
 
-        state["distance"],
-        state["time"]
+        # =================================================
+        # MAIN GAUGE
+        # =================================================
+
+        state.get("p1_gauge_ratio", 0.0),
+        state.get("p2_gauge_ratio", 0.0),
+
+        # =================================================
+        # ULTRA GAUGE
+        # =================================================
+
+        state.get("p1_ultra_gauge_ratio", 0.0),
+        state.get("p2_ultra_gauge_ratio", 0.0),
+
+        # =================================================
+        # SPACING
+        # =================================================
+
+        state.get("distance", 0.0),
+
+        # =================================================
+        # TIME
+        # =================================================
+
+        state.get("time", 0.0),
     ]

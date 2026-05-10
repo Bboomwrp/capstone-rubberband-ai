@@ -22,12 +22,32 @@ def read_json(path):
         return None
 
 def write_action(action, value):
-    data = {
+
+    payload = {
         "action": action,
         "value": value
     }
-    with open(ACTION_FILE, "w") as f:
-        json.dump(data, f)
+
+    for attempt in range(5):
+
+        try:
+
+            with open(ACTION_FILE, "w") as f:
+
+                json.dump(payload, f)
+
+            return
+
+        except PermissionError:
+
+            print(
+                f"⚠ ACTION FILE LOCKED "
+                f"(attempt {attempt+1})"
+            )
+
+            time.sleep(0.05)
+
+    print("❌ FAILED TO WRITE ACTION")
 
 def policy(state, epsilon=0.3):
 
@@ -124,7 +144,7 @@ def compute_reward(state, next_state):
     reward = 0.0
 
     # =====================================================
-    # 1. DAMAGE REWARD
+    # 1. DAMAGE IMPACT
     # =====================================================
 
     p1_loss = (
@@ -137,47 +157,38 @@ def compute_reward(state, next_state):
         - next_state["p2_hp_ratio"]
     )
 
-    # symmetric net damage
     net_damage = p2_loss - p1_loss
 
-    reward += net_damage * 2.0
+    # MUCH STRONGER
+    reward += net_damage * 40.0
 
     # =====================================================
-    # 2. COMEBACK REWARD
+    # 2. COMEBACK PROGRESS
     # =====================================================
 
     prev_gap = abs(state["hp_ratio_diff"])
     next_gap = abs(next_state["hp_ratio_diff"])
 
-    # encourage closer matches
-    if next_gap < prev_gap:
+    gap_change = prev_gap - next_gap
 
-        comeback_gain = prev_gap - next_gap
-
-        reward += comeback_gain * 2.5
-
-    # discourage snowball
-    else:
-
-        snowball = next_gap - prev_gap
-
-        reward -= snowball * 1.5
+    # direct meaningful comeback
+    reward += gap_change * 60.0
 
     # =====================================================
-    # 3. SURVIVAL REWARD
+    # 3. SURVIVAL BONUS
     # =====================================================
 
-    # identify disadvantaged side
+    # disadvantaged player survives
     if state["hp_ratio_diff"] < 0:
-        # P1 behind
-        reward += (-p1_loss) * 1.0
+
+        reward += (-p1_loss) * 15.0
 
     else:
-        # P2 behind
-        reward += (-p2_loss) * 1.0
+
+        reward += (-p2_loss) * 15.0
 
     # =====================================================
-    # 4. RESOURCE REWARD
+    # 4. RESOURCE MOMENTUM
     # =====================================================
 
     p1_resource_gain = (
@@ -200,52 +211,61 @@ def compute_reward(state, next_state):
          - state["p2_ultra_gauge_ratio"])
     )
 
-    # reward disadvantaged side gaining resources
     if state["hp_ratio_diff"] < 0:
 
-        reward += p1_resource_gain * 1.5
+        reward += p1_resource_gain * 12.0
 
     else:
 
-        reward += p2_resource_gain * 1.5
+        reward += p2_resource_gain * 12.0
 
     # =====================================================
-    # 5. STABILITY PENALTY
+    # 5. SNOWBALL PENALTY
     # =====================================================
 
-    # abnormal sudden transitions
-    if abs(p1_loss) > 0.40 or abs(p2_loss) > 0.40:
+    # punish runaway advantage
+    if next_gap > prev_gap:
 
-        reward -= 3.0
-
-    # excessive gap
-    if next_gap > 0.60:
-
-        reward -= 2.0
+        reward -= (
+            (next_gap - prev_gap)
+            * 35.0
+        )
 
     # =====================================================
-    # 6. TERMINAL REWARD
+    # 6. EXTREME STATE PENALTY
+    # =====================================================
+
+    # too one-sided
+    if next_gap > 0.70:
+
+        reward -= 8.0
+
+    # unrealistic HP jump
+    if abs(p1_loss) > 0.45 or abs(p2_loss) > 0.45:
+
+        reward -= 10.0
+
+    # =====================================================
+    # 7. TERMINAL REWARD
     # =====================================================
 
     if next_state.get("done", False):
 
-        # perfectly symmetric terminal reward
-
         if next_state["p1_hp_ratio"] <= 0:
 
-            reward -= 5.0
+            reward -= 30.0
 
         elif next_state["p2_hp_ratio"] <= 0:
 
-            reward += 5.0
+            reward += 30.0
 
     # =====================================================
     # NORMALIZATION
     # =====================================================
 
-    reward = max(min(reward, 10.0), -10.0)
+    reward = max(min(reward, 30.0), -30.0)
 
-    reward = reward / 10.0
+    reward /= 30.0
 
     return reward
 
@@ -430,8 +450,6 @@ last_done = False
 episode_done = False
 last_terminal_signature = None
 startup_synced = False
-last_seen_time = None
-stable_updates = 0
 last_action_time = 0
 
 while True:
@@ -441,43 +459,60 @@ while True:
         time.sleep(0.1)
         continue
 
+    # ================= TERMINAL DETECTION =================
+    if state.get("done", False):
+
+        if prev_state is not None:
+
+            sig = make_signature(prev_state, state)
+
+            # prevent duplicate terminal
+            if sig != last_terminal_signature:
+
+                last_terminal_signature = sig
+
+                reward = compute_reward(
+                    prev_state,
+                    state
+                )
+
+                save_dataset(
+                    prev_state,
+                    "NONE",
+                    1.0,
+                    reward,
+                    state
+                )
+
+                print("🏁 TERMINAL SAVED")
+
+                ROUND_ID += 1
+
+                print(f"🎮 ROUND ID: {ROUND_ID}")
+
+        episode_done = True
+        startup_synced = False
+        prev_state = None
+
+        continue
+
     # =====================================================
     # STARTUP SYNC
-    # wait for fresh realtime state
     # =====================================================
 
     if not startup_synced:
 
+        # wait until real match starts
         if not state.get("inMatch", False):
 
-            time.sleep(0.2)
-            continue
-
-        current_time = state.get("time", None)
-
-        if current_time is None:
             time.sleep(0.1)
-            continue
-
-        if last_seen_time is None:
-
-            last_seen_time = current_time
-
-            time.sleep(0.2)
 
             continue
 
-        # realtime countdown detected
-        if current_time < last_seen_time:
+        # wait until round actually begins
+        if state.get("time", 1.0) > 0.995:
 
-            stable_updates += 1
-
-        last_seen_time = current_time
-
-        # require only 2 valid updates
-        if stable_updates < 2:
-
-            time.sleep(0.2)
+            time.sleep(0.05)
 
             continue
 
@@ -487,32 +522,21 @@ while True:
 
         write_action("NONE", 1.0)
 
-        time.sleep(0.5)
+        prev_state = state
 
         continue
 
-    # ================= ROUND RESET =================
-    if prev_state is not None:
-        if state["time"] - prev_state["time"] > 0.5:
-            print("🔄 NEW ROUND DETECTED")
-
-            ROUND_ID += 1
-            print(f"🎮 ROUND ID: {ROUND_ID}")
-
-            episode_done = False
-            prev_state = None
-            last_terminal_signature = None
-            continue
-
     # ================= FORCE UNSTUCK =================
     if episode_done and prev_state is None:
-        if state.get("time", 1.0) < 0.95:
+        if ( state.get("inMatch", False) and state.get("time", 1.0) < 0.95):
             episode_done = False
 
     # ================= BLOCK AFTER DONE =================
     if episode_done:
-        time.sleep(0.1)
-        continue
+
+        if state["time"] < 0.95:
+
+            episode_done = False
 
     # ================= FILTER PREVIEW =================
     if state.get("time", 1.0) >= 0.99:
@@ -546,55 +570,82 @@ while True:
         time.sleep(0.1)
         continue
 
-    # ================= TERMINAL DETECTION =================
-    if prev_state is not None:
-        if is_terminal(prev_state, state):
-
-            sig = make_signature(prev_state, state)
-
-            # ❗ กัน terminal ซ้ำ
-            if sig == last_terminal_signature:
-                continue
-
-            last_terminal_signature = sig
-
-            state["done"] = True
-
-            reward = compute_reward(prev_state, state)
-            save_dataset(prev_state, "NONE", 1.0, reward, state)
-
-            print("🏁 TERMINAL SAVED")
-
-            episode_done = True
-            prev_state = None
-            continue
-
     # ================= BLOCK NORMAL FLOW IF DONE =================
     if state.get("done", False):
         prev_state = None
         continue
 
     # ================= ACTION =================
-    if time.time() - last_action_time < 5.0:
-        time.sleep(0.2)
+    if state.get("is_boost_active", False):
+
+        time.sleep(0.3)
+
+        next_state = read_json(STATE_FILE)
+
+        if next_state is None:
+            continue
+
+        if is_same_state(state, next_state):
+            continue
+
+        reward = compute_reward(state, next_state)
+
+        save_dataset(
+            state,
+            "NONE",
+            1.0,
+            reward,
+            next_state
+        )
+
+        prev_state = next_state
+
+        print("👀 OBSERVING ACTIVE BOOST")
+
         continue
     
     action, value = policy(state)
-    
+
+
     if action == "NONE":
 
         write_action("NONE", 1.0)
 
-        prev_state = state
-
         time.sleep(0.5)
 
+        next_state = read_json(STATE_FILE)
+
+        if next_state is None:
+            continue
+
+        # skip stale transition
+        if is_same_state(state, next_state):
+            continue
+
+        reward = compute_reward(
+            state,
+            next_state
+        )
+
+        save_dataset(
+            state,
+            "NONE",
+            1.0,
+            reward,
+            next_state
+        )
+
+        print(f"📊 NONE | reward: {reward:.4f}")
+
+        prev_state = next_state
+
         continue
+
     
     write_action(action, value)
     last_action_time = time.time()
 
-    time.sleep(3.0)
+    time.sleep(1.0)
 
     next_state = read_json(STATE_FILE)
     
@@ -606,7 +657,7 @@ while True:
 
         print("⚠ SAME STATE TRANSITION")
 
-        prev_state = next_state
+        prev_state = state
 
         continue
     
@@ -615,14 +666,14 @@ while True:
 
         print("⚠ ACTION NOT APPLIED")
 
-        prev_state = next_state
+        prev_state = state
 
         continue
     if not next_state.get("is_boost_active", False):
 
         print("⚠ BOOST NOT ACTIVE")
 
-        prev_state = next_state
+        prev_state = state
 
         continue
     # ================= VALIDATE NEXT STATE =================
@@ -648,4 +699,4 @@ while True:
     print(f"📊 {action} | reward: {reward:.4f}")
 
     # ================= UPDATE =================
-    prev_state = next_state
+    prev_state = state

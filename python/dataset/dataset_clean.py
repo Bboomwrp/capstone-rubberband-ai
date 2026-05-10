@@ -1,164 +1,163 @@
-# dataset_clean.py
-
-import os
 import json
+import math
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+INPUT_FILE = "dataset_v2.jsonl"
+OUTPUT_FILE = "dataset_v2_clean.jsonl"
 
-INPUT_FILE = os.path.join(
-    BASE_DIR,
-    "dataset.jsonl"
-)
+required_fields = [
+    "state",
+    "next_state",
+    "action",
+    "reward"
+]
 
-OUTPUT_FILE = os.path.join(
-    BASE_DIR,
-    "dataset_clean.jsonl"
-)
-
-# =========================================================
-# CONFIG
-# =========================================================
-
-TIME_EPS = 1e-5
-HP_EPS = 1e-5
-
-# =========================================================
-# HELPERS
-# =========================================================
 
 def is_same_state(a, b):
 
-    keys = [
-        "time",
-        "p1_hp",
-        "p2_hp",
-        "hp_diff",
-        "hp_ratio",
-        "p1_gauge",
-        "p2_gauge",
-        "distance"
-    ]
-
-    for k in keys:
-
-        if abs(a.get(k, 0) - b.get(k, 0)) > 1e-5:
-            return False
-
-    return True
+    return (
+        a["time"] == b["time"]
+        and
+        a["p1_hp_ratio"] == b["p1_hp_ratio"]
+        and
+        a["p2_hp_ratio"] == b["p2_hp_ratio"]
+        and
+        a["distance"] == b["distance"]
+        and
+        a["done"] == b["done"]
+    )
 
 
-def is_invalid_transition(state, next_state):
+def invalid_ratio(x):
 
-    # same state
-    if is_same_state(state, next_state):
-        return True
+    return (
+        x is None
+        or
+        math.isnan(x)
+        or
+        x < 0.0
+        or
+        x > 1.0
+    )
 
-    # invalid timer
-    if next_state["time"] > state["time"] + TIME_EPS:
-        return True
-
-    # preview / non-fight
-    if state["time"] >= 0.99:
-        return True
-
-    return False
-
-
-# =========================================================
-# CLEAN
-# =========================================================
-
-print("🧹 Cleaning dataset...")
 
 cleaned = []
-seen = set()
-
-removed_duplicate = 0
-removed_invalid = 0
-removed_terminal_duplicate = 0
-
-last_terminal_signature = None
+removed = 0
 
 with open(INPUT_FILE, "r", encoding="utf-8") as f:
 
-    for line in f:
+    for line_num, line in enumerate(f):
 
         try:
-            data = json.loads(line)
 
-            state = data["state"]
-            next_state = data["next_state"]
+            sample = json.loads(line)
 
-            # =============================================
-            # INVALID TRANSITION
-            # =============================================
+        except:
+            removed += 1
+            continue
 
-            if is_invalid_transition(state, next_state):
-                removed_invalid += 1
+        # =================================================
+        # REQUIRED FIELDS
+        # =================================================
+
+        valid = True
+
+        for field in required_fields:
+
+            if field not in sample:
+                valid = False
+                break
+
+        if not valid:
+            removed += 1
+            continue
+
+        state = sample["state"]
+        next_state = sample["next_state"]
+
+        # =================================================
+        # INVALID RATIOS
+        # =================================================
+
+        ratio_keys = [
+            "p1_hp_ratio",
+            "p2_hp_ratio",
+            "p1_gauge_ratio",
+            "p2_gauge_ratio",
+            "p1_ultra_gauge_ratio",
+            "p2_ultra_gauge_ratio"
+        ]
+
+        bad_ratio = False
+
+        for key in ratio_keys:
+
+            if invalid_ratio(state.get(key, 0)):
+                bad_ratio = True
+
+            if invalid_ratio(next_state.get(key, 0)):
+                bad_ratio = True
+
+        if bad_ratio:
+            removed += 1
+            continue
+
+        # =================================================
+        # INVALID TIME FLOW
+        # =================================================
+
+        if next_state["done"] is False:
+
+            if next_state["time"] > state["time"]:
+
+                removed += 1
                 continue
 
-            # =============================================
-            # TERMINAL DUPLICATE
-            # =============================================
+        # =================================================
+        # DUPLICATE TERMINAL
+        # =================================================
 
-            done = next_state.get("done", False)
+        if (
+            state.get("done", False)
+            and
+            next_state.get("done", False)
+        ):
 
-            if done:
+            removed += 1
+            continue
 
-                terminal_signature = (
-                    round(next_state["p1_hp"], 3),
-                    round(next_state["p2_hp"], 3),
-                    round(next_state["time"], 3)
-                )
+        # =================================================
+        # IDENTICAL STATES
+        # =================================================
 
-                if terminal_signature == last_terminal_signature:
-                    removed_terminal_duplicate += 1
-                    continue
+        if is_same_state(state, next_state):
 
-                last_terminal_signature = terminal_signature
+            removed += 1
+            continue
 
-            else:
-                last_terminal_signature = None
+        cleaned.append(sample)
 
-            # =============================================
-            # EXACT DUPLICATE
-            # =============================================
+# =====================================================
+# REWRITE SAMPLE IDS
+# =====================================================
 
-            sig = json.dumps(data, sort_keys=True)
+for i, sample in enumerate(cleaned):
 
-            if sig in seen:
-                removed_duplicate += 1
-                continue
+    sample["sample_id"] = i
 
-            seen.add(sig)
-
-            cleaned.append(data)
-
-        except Exception as e:
-            print("⚠ Skip bad line:", e)
-
-# =========================================================
-# SAVE
-# =========================================================
+# =====================================================
+# SAVE CLEAN DATASET
+# =====================================================
 
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
 
-    for item in cleaned:
-        f.write(json.dumps(item) + "\n")
+    for sample in cleaned:
 
-# =========================================================
-# REPORT
-# =========================================================
+        f.write(
+            json.dumps(sample)
+            + "\n"
+        )
 
-print("\n========== CLEAN REPORT ==========")
-
-print(f"✅ Cleaned samples: {len(cleaned)}")
-
-print(f"❌ Removed invalid: {removed_invalid}")
-
-print(f"❌ Removed duplicates: {removed_duplicate}")
-
-print(f"❌ Removed terminal duplicates: {removed_terminal_duplicate}")
-
-print(f"\n💾 Saved to:")
-print(OUTPUT_FILE)
+print(f"✅ CLEANED DATASET SAVED")
+print(f"📊 ORIGINAL: {line_num + 1}")
+print(f"📊 CLEANED : {len(cleaned)}")
+print(f"🗑 REMOVED : {removed}")

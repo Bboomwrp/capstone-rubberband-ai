@@ -10,7 +10,7 @@ public class RLActionReceiver : MonoBehaviour
 
     private string actionPath;
 
-    private float checkInterval = 1f;
+    private float checkInterval = 0.2f;
     private float lastCheckTime = 0f;
 
     private float boostDuration = 5f;
@@ -399,6 +399,12 @@ public class RLActionReceiver : MonoBehaviour
             p2.gaugeGainMultiplier = 1f;
         }
 
+        if (p1BoostText != null)
+            p1BoostText.gameObject.SetActive(false);
+
+        if (p2BoostText != null)
+            p2BoostText.gameObject.SetActive(false);
+
         boostedTarget = null;
 
         Debug.Log("🔄 Reset multipliers");
@@ -507,7 +513,6 @@ public class RLActionReceiver : MonoBehaviour
 
         ui.gameObject.SetActive(true);
 
-        StartCoroutine(HideBoostUI(ui));
     }
 
     ControlsScript GetCurrentlyBoostedPlayer()
@@ -526,13 +531,6 @@ public class RLActionReceiver : MonoBehaviour
     public bool IsBoostActive()
     {
         return boostTimer > 0f;
-    }
-
-    IEnumerator HideBoostUI(Text ui)
-    {
-        yield return new WaitForSeconds(1.5f);
-
-        ui.gameObject.SetActive(false);
     }
 
     [System.Serializable]
