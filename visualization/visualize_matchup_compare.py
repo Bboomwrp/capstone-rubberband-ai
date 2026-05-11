@@ -9,7 +9,7 @@ from utils import group_by_round, load_dataset
 # =====================================================
 
 BASELINE_DATASET = (
-    "dataset_baseline_clean.jsonl"
+    "dataset_v2_clean.jsonl"
 )
 
 RL_DATASET = (

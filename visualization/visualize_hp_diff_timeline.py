@@ -9,7 +9,7 @@ from utils import load_dataset
 # DATASETS
 # =====================================================
 
-BASELINE_DATASET = "dataset_baseline_clean.jsonl"
+BASELINE_DATASET = "dataset_v2_clean.jsonl"
 RL_DATASET = "dataset_rl_clean.jsonl"
 
 # =====================================================
@@ -141,42 +141,133 @@ x = np.linspace( 99, 0, NUM_BINS )
 # PLOT
 # =====================================================
 
+bg_color = "#07111f"
+
 for matchup in MATCHUPS:
 
-    plt.figure(figsize=(10, 5))
+    fig, ax = plt.subplots(
+        figsize=(10, 5)
+    )
 
+    # =================================================
+    # BACKGROUND
+    # =================================================
+
+    fig.patch.set_facecolor(
+        bg_color
+    )
+
+    ax.set_facecolor(
+        bg_color
+    )
+
+    # =================================================
     # BASELINE
-    plt.plot(
+    # =================================================
+
+    ax.plot(
         x,
         baseline_result[matchup],
+        linestyle="--",
+        linewidth=2.5,
+        color="#4fc3f7",
         label="Baseline"
     )
 
+    # =================================================
     # RL
-    plt.plot(
+    # =================================================
+
+    ax.plot(
         x,
         rl_result[matchup],
-        label="RL Rubberband"
+        linestyle="-",
+        linewidth=3,
+        color="#81d4fa",
+        label="RL Inference"
     )
 
-    plt.xlabel(
-        "Remaining Round Time (Seconds)"
+    # =================================================
+    # LABELS
+    # =================================================
+
+    ax.set_xlabel(
+        "Remaining Round Time (Seconds)",
+        color="white",
+        fontsize=11
     )
 
-    plt.ylabel(
-        "Average HP Difference"
+    ax.set_ylabel(
+        "Average HP Difference",
+        color="white",
+        fontsize=11
     )
 
-    plt.ylim(0, 1)
-
-    plt.title(
-        f"HP Difference Timeline - {matchup}"
+    ax.set_title(
+        f"HP Difference Timeline - {matchup}",
+        color="white",
+        fontsize=14
     )
 
-    plt.legend()
+    # =================================================
+    # LIMITS
+    # =================================================
 
-    plt.grid(True)
+    ax.set_ylim(0, 1)
 
-    plt.gca().invert_xaxis()
+    # =================================================
+    # AXIS COLORS
+    # =================================================
+
+    ax.tick_params(
+        axis="x",
+        colors="white"
+    )
+
+    ax.tick_params(
+        axis="y",
+        colors="white"
+    )
+
+    # =================================================
+    # GRID
+    # =================================================
+
+    ax.grid(
+        True,
+        alpha=0.15,
+        color="white"
+    )
+
+    # =================================================
+    # LEGEND
+    # =================================================
+
+    legend = ax.legend()
+
+    for text in legend.get_texts():
+
+        text.set_color("white")
+
+    # =================================================
+    # SPINES
+    # =================================================
+
+    for spine in ax.spines.values():
+
+        spine.set_color("white")
+
+    # =================================================
+    # FIGHTING GAME STYLE
+    # =================================================
+
+    ax.invert_xaxis()
+
+    # =================================================
+    # SHOW
+    # =================================================
+
+    plt.tight_layout()
 
     plt.show()
+

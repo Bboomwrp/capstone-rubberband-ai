@@ -1,8 +1,8 @@
 import json
 import math
 
-INPUT_FILE = "dataset_v2.jsonl"
-OUTPUT_FILE = "dataset_v2_clean.jsonl"
+INPUT_FILE = "dataset_rl.jsonl"
+OUTPUT_FILE = "dataset_rl_clean.jsonl"
 
 required_fields = [
     "state",

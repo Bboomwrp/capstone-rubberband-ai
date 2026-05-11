@@ -32,6 +32,9 @@ MODEL_PATH = os.path.join(
     "dqn_model.pth"
 )
 
+DATASET_DIR = os.path.join(BASE_DIR, "dataset")
+os.makedirs(DATASET_DIR, exist_ok=True)
+DATASET_FILE = os.path.join(DATASET_DIR, "dataset_rl.jsonl")
 # =========================================================
 # ACTIONS
 # =========================================================
@@ -72,14 +75,12 @@ print("✅ MODEL LOADED")
 # =========================================================
 
 def read_json(path):
-
     try:
         with open(path, "r") as f:
             return json.load(f)
     except:
         return None
-
-
+    
 def write_action(action, value):
 
     payload = {
@@ -108,178 +109,482 @@ def write_action(action, value):
 
     print("❌ FAILED TO WRITE ACTION")
 
+def adaptive_boost_value(state, action):
 
-def is_real_fight(state):
+    hp_ratio_diff = abs(
+        state["hp_ratio_diff"]
+    )
 
-    if not state.get("inMatch", False):
-        return False
+    # =====================================================
+    # BASE INTENSITY
+    # =====================================================
 
-    if state.get("time", 1.0) >= 0.99:
-        return False
+    if hp_ratio_diff > 0.40:
 
-    return True
+        intensity = 1.35
 
-# =========================================================
-# INFERENCE
-# =========================================================
+    elif hp_ratio_diff > 0.30:
 
-def select_action(state, epsilon=0.05):
+        intensity = 1.25
 
-    # RANDOM EXPLORATION 
+    elif hp_ratio_diff > 0.20:
+
+        intensity = 1.18
+
+    elif hp_ratio_diff > 0.10:
+
+        intensity = 1.10
+
+    else:
+
+        intensity = 1.05
+
+    # =====================================================
+    # ACTION-SPECIFIC ADJUSTMENT
+    # =====================================================
+
+    if action == "BOOST_ATTACK":
+
+        value = intensity
+
+    elif action == "BOOST_DEFENSE":
+
+        value = intensity
+
+    elif action == "BOOST_GAUGE":
+
+        value = min(intensity + 0.05, 1.35)
+
+    else:
+
+        value = 1.0
+
+    # =====================================================
+    # CLAMP
+    # =====================================================
+
+    value = max(
+        1.0,
+        min(value, 1.40)
+    )
+
+    return round(value, 2)
+
+def model_policy(state, epsilon=0.0):
+
+    # =====================================================
+    # CONSTRAINTS
+    # =====================================================
+
+    p1_hp_ratio = state["p1_hp_ratio"]
+    p2_hp_ratio = state["p2_hp_ratio"]
+
+    hp_ratio_diff = abs(
+        state["hp_ratio_diff"]
+    )
+
+    # EARLY GAME
+    if p1_hp_ratio > 0.90 and p2_hp_ratio > 0.90:
+        return "NONE", 1.0
+
+    # CLOSE MATCH
+    if hp_ratio_diff < 0.075:
+        return "NONE", 1.0
+
+    # CRITICAL FINISH
+    if p1_hp_ratio < 0.10 and p2_hp_ratio < 0.10:
+        return "NONE", 1.0
+
+    # =====================================================
+    # RANDOM EXPLORATION
+    # =====================================================
 
     if random.random() < epsilon:
 
-        idx = random.randint(
-            0,
-            len(ACTIONS) - 1
-        )
+        action = random.choice(ACTIONS)
 
-        action = ACTIONS[idx]
+    else:
 
-        print(f"🎲 RANDOM ACTION: {action}")
+        state_vector = torch.FloatTensor(
+            [state_to_vector(state)]
+        ).to(DEVICE)
 
-        return action
+        with torch.no_grad():
 
-    # MODEL INFERENCE
+            q_values = model(state_vector)
 
-    state_vec = state_to_vector(state)
+            # best action
+            action_idx = torch.argmax(
+                q_values
+            ).item()
 
-    state_tensor = torch.FloatTensor(
-        state_vec
-    ).unsqueeze(0).to(DEVICE)
+            action = ACTIONS[action_idx]
 
-    with torch.no_grad():
+    # =====================================================
+    # ADAPTIVE BOOST VALUE
+    # =====================================================
 
-        q_values = model(state_tensor)
-
-        q_values = q_values.cpu().numpy()[0]
-
-    action_idx = int(np.argmax(q_values))
-
-    action = ACTIONS[action_idx]
-
-    # DEBUG
-
-    print(
-        f"🧠 ACTION: {action} | "
-        f"Q: {np.round(q_values, 3)}"
+    value = adaptive_boost_value(
+        state,
+        action
     )
 
-    return action
+    return action, value
+
+def compute_reward(state, next_state):
+
+    reward = 0.0
+
+    # =====================================================
+    # 1. DAMAGE IMPACT
+    # =====================================================
+
+    p1_loss = (
+        state["p1_hp_ratio"]
+        - next_state["p1_hp_ratio"]
+    )
+
+    p2_loss = (
+        state["p2_hp_ratio"]
+        - next_state["p2_hp_ratio"]
+    )
+
+    net_damage = p2_loss - p1_loss
+
+    # MUCH STRONGER
+    reward += net_damage * 40.0
+
+    # =====================================================
+    # 2. COMEBACK PROGRESS
+    # =====================================================
+
+    prev_gap = abs(state["hp_ratio_diff"])
+    next_gap = abs(next_state["hp_ratio_diff"])
+
+    gap_change = prev_gap - next_gap
+
+    # direct meaningful comeback
+    reward += gap_change * 60.0
+
+    # =====================================================
+    # 3. SURVIVAL BONUS
+    # =====================================================
+
+    # disadvantaged player survives
+    if state["hp_ratio_diff"] < 0:
+
+        reward += (-p1_loss) * 15.0
+
+    else:
+
+        reward += (-p2_loss) * 15.0
+
+    # =====================================================
+    # 4. RESOURCE MOMENTUM
+    # =====================================================
+
+    p1_resource_gain = (
+        (next_state["p1_gauge_ratio"]
+         - state["p1_gauge_ratio"])
+
+        +
+
+        (next_state["p1_ultra_gauge_ratio"]
+         - state["p1_ultra_gauge_ratio"])
+    )
+
+    p2_resource_gain = (
+        (next_state["p2_gauge_ratio"]
+         - state["p2_gauge_ratio"])
+
+        +
+
+        (next_state["p2_ultra_gauge_ratio"]
+         - state["p2_ultra_gauge_ratio"])
+    )
+
+    if state["hp_ratio_diff"] < 0:
+
+        reward += p1_resource_gain * 12.0
+
+    else:
+
+        reward += p2_resource_gain * 12.0
+
+    # =====================================================
+    # 5. SNOWBALL PENALTY
+    # =====================================================
+
+    # punish runaway advantage
+    if next_gap > prev_gap:
+
+        reward -= (
+            (next_gap - prev_gap)
+            * 35.0
+        )
+
+    # =====================================================
+    # 6. EXTREME STATE PENALTY
+    # =====================================================
+
+    # too one-sided
+    if next_gap > 0.70:
+
+        reward -= 8.0
+
+    # unrealistic HP jump
+    if abs(p1_loss) > 0.45 or abs(p2_loss) > 0.45:
+
+        reward -= 10.0
+
+    # =====================================================
+    # 7. TERMINAL REWARD
+    # =====================================================
+
+    if next_state.get("done", False):
+
+        if next_state["p1_hp_ratio"] <= 0:
+
+            reward -= 30.0
+
+        elif next_state["p2_hp_ratio"] <= 0:
+
+            reward += 30.0
+
+    # =====================================================
+    # NORMALIZATION
+    # =====================================================
+
+    reward = max(min(reward, 30.0), -30.0)
+
+    reward /= 30.0
+
+    return reward
+
+def save_dataset(prev, action, action_value, reward, curr):
+
+    global SAMPLE_ID
+    global ROUND_ID
+
+    SAMPLE_ID += 1
+
+    # =====================================================
+    # CHARACTER INFO
+    # =====================================================
+
+    p1_character = prev.get(
+        "p1_character",
+        "unknown"
+    ).lower()
+
+    p2_character = prev.get(
+        "p2_character",
+        "unknown"
+    ).lower()
+
+    # =====================================================
+    # MATCHUP
+    # =====================================================
+
+    matchup = (
+        p1_character
+        + "_vs_"
+        + p2_character
+    )
+
+    # =====================================================
+    # METADATA
+    # =====================================================
+
+    metadata = {
+
+        "dataset_version": "v2",
+        # ---------------------------------------------
+        # dataset indexing
+        # ---------------------------------------------
+
+        "sample_id": SAMPLE_ID,
+
+        "round_id": ROUND_ID,
+
+        # ---------------------------------------------
+        # matchup info
+        # ---------------------------------------------
+
+        "matchup": matchup,
+
+        "p1_character": p1_character,
+
+        "p2_character": p2_character,
+
+        # ---------------------------------------------
+        # timestamp
+        # ---------------------------------------------
+
+        "timestamp": time.time(),
+
+        # ---------------------------------------------
+        # gameplay context
+        # ---------------------------------------------
+
+        "action": action,
+
+        "action_value": action_value,
+
+        "reward": reward,
+
+        # ---------------------------------------------
+        # state transition
+        # ---------------------------------------------
+
+        "state": prev,
+
+        "next_state": curr
+    }
+
+    # =====================================================
+    # SAVE
+    # =====================================================
+
+    with open(DATASET_FILE, "a") as f:
+
+        f.write(
+            json.dumps(metadata)
+            + "\n"
+        )
+
+def load_dataset_metadata():
+
+    if not os.path.exists(DATASET_FILE):
+
+        return 1, 0
+
+    try:
+
+        with open(DATASET_FILE, "r") as f:
+
+            lines = f.readlines()
+
+            if len(lines) == 0:
+                return 1, 0
+
+            last_entry = json.loads(lines[-1])
+
+            last_round_id = last_entry.get(
+                "round_id",
+                0
+            )
+
+            last_sample_id = last_entry.get(
+                "sample_id",
+                0
+            )
+
+            return (
+                last_round_id + 1,
+                last_sample_id
+            )
+
+    except Exception as e:
+
+        print(f"⚠ Failed to load dataset metadata: {e}")
+
+        return 1, 0
+
+def is_real_fight(state):
+    if state.get("inMatch", False) is False:
+        return False
+    
+    if state.get("time", 1.0) >= 0.99:
+        return False
+    return True
+
+def is_terminal(prev, curr):
+    if prev is None or curr is None:
+        return False
+
+    p1_dead = prev["p1_hp_ratio"] > 0 and curr["p1_hp_ratio"] <= 0
+    p2_dead = prev["p2_hp_ratio"] > 0 and curr["p2_hp_ratio"] <= 0
+
+    return p1_dead or p2_dead
+
+def make_signature(prev, curr):
+    return (
+        round(prev["p1_hp_ratio"], 3),
+        round(prev["p2_hp_ratio"], 3),
+        round(curr["p1_hp_ratio"], 3),
+        round(curr["p2_hp_ratio"], 3)
+    )
 
 def is_same_state(a, b):
     return abs(a["p1_hp_ratio"] - b["p1_hp_ratio"]) < 1e-3 and \
            abs(a["p2_hp_ratio"] - b["p2_hp_ratio"]) < 1e-3 and \
            abs(a["time"] - b["time"]) < 1e-3
 
-def should_allow_boost(state):
+# =====================================================
+# METADATA
+# =====================================================
 
-    p1_hp_ratio = state["p1_hp_ratio"]
-    p2_hp_ratio = state["p2_hp_ratio"]
+ROUND_ID, SAMPLE_ID = load_dataset_metadata()
 
-    hp_ratio_diff = abs(state["hp_ratio_diff"])
+print(f"📂 RESUME ROUND_ID: {ROUND_ID}")
+print(f"📂 RESUME SAMPLE_ID: {SAMPLE_ID}")
 
-    # =====================================================
-    # EARLY GAME
-    # =====================================================
 
-    if p1_hp_ratio > 0.90 and p2_hp_ratio > 0.90:
-        return False
+# ================= LOOP =================
 
-    # =====================================================
-    # CLOSE MATCH
-    # =====================================================
-
-    if hp_ratio_diff < 0.075:
-        return False
-
-    # =====================================================
-    # LOW HP FINISH
-    # =====================================================
-
-    if p1_hp_ratio < 0.10 and p2_hp_ratio < 0.10:
-        return False
-
-    return True
-
-# =========================================================
-# ADAPTIVE VALUE
-# =========================================================
-def get_boost_value(action, state):
-
-    hp_ratio_diff = abs(state["hp_ratio_diff"])
-
-    # Intensity
-    if hp_ratio_diff > 0.3:
-        intensity = 1.30
-    elif hp_ratio_diff > 0.2:
-        intensity = 1.20
-    elif hp_ratio_diff > 0.1:
-        intensity = 1.10
-    else:
-        intensity = 1.05
-
-    # ACTION TYPE ADJUSTMENT
-    if action == "BOOST_ATTACK":
-        return intensity
-    elif action == "BOOST_DEFENSE":
-        return min(intensity+0.05, 1.35)
-    elif action == "BOOST_GAUGE":
-        return min(intensity+0.1, 1.4)
-    
-    return 1.0
-
-# =========================================================
-# MAIN LOOP
-# =========================================================
-
-print("🚀 RL AGENT STARTED")
+print("🤖 RL Agent started")
 
 write_action("NONE", 1.0)
 
 prev_state = None
-startup_synced = False
+last_done = False
 episode_done = False
+last_terminal_signature = None
+startup_synced = False
+last_action_time = 0
 
 while True:
-
     state = read_json(STATE_FILE)
 
     if state is None:
-
         time.sleep(0.1)
-
         continue
 
-    # =====================================================
-    # TERMINAL DETECTION (HIGHEST PRIORITY)
-    # =====================================================
-
+    # ================= TERMINAL DETECTION =================
     if state.get("done", False):
 
-        print("🏁 TERMINAL")
+        if prev_state is not None:
 
-        write_action("NONE", 1.0)
+            sig = make_signature(prev_state, state)
 
-        prev_state = None
-        startup_synced = False
+            # prevent duplicate terminal
+            if sig != last_terminal_signature:
+
+                last_terminal_signature = sig
+
+                reward = compute_reward(
+                    prev_state,
+                    state
+                )
+
+                save_dataset(
+                    prev_state,
+                    "NONE",
+                    1.0,
+                    reward,
+                    state
+                )
+
+                print("🏁 TERMINAL SAVED")
+
+                ROUND_ID += 1
+
+                print(f"🎮 ROUND ID: {ROUND_ID}")
+
         episode_done = True
-
-        time.sleep(1.0)
-
-        continue
-
-    # =====================================================
-    # RESET ACTION OUTSIDE MATCH
-    # =====================================================
-
-    if not state.get("inMatch", False):
-
-        write_action("NONE", 1.0)
-
+        startup_synced = False
         prev_state = None
-
-        time.sleep(0.1)
 
         continue
 
@@ -289,7 +594,14 @@ while True:
 
     if not startup_synced:
 
-        # wait until gameplay actually begins
+        # wait until real match starts
+        if not state.get("inMatch", False):
+
+            time.sleep(0.1)
+
+            continue
+
+        # wait until round actually begins
         if state.get("time", 1.0) > 0.995:
 
             time.sleep(0.05)
@@ -297,8 +609,6 @@ while True:
             continue
 
         startup_synced = True
-
-        episode_done = False
 
         print("✅ STARTUP SYNCED")
 
@@ -308,154 +618,135 @@ while True:
 
         continue
 
-    # =====================================================
-    # WAIT NEXT ROUND AFTER TERMINAL
-    # =====================================================
+    # ================= FORCE UNSTUCK =================
+    if episode_done and prev_state is None:
+        if ( state.get("inMatch", False) and state.get("time", 1.0) < 0.95):
+            episode_done = False
 
+    # ================= BLOCK AFTER DONE =================
     if episode_done:
 
-        if (
-            state.get("inMatch", False)
-            and
-            state.get("time", 1.0) < 0.95
-        ):
+        if state["time"] < 0.95:
 
             episode_done = False
 
-        else:
-
-            time.sleep(0.1)
-
-            continue
-
-    # =====================================================
-    # PREVIEW / READY FILTER
-    # =====================================================
-
+    # ================= FILTER PREVIEW =================
     if state.get("time", 1.0) >= 0.99:
-
         time.sleep(0.1)
-
         continue
 
-    # =====================================================
-    # FULL HP OPENING FILTER
-    # =====================================================
-
-    if (
-        abs(state["hp_ratio_diff"]) < 1e-5
-        and
-        state["p1_hp_ratio"] > 0.99
-        and
-        state["p2_hp_ratio"] > 0.99
-    ):
-
+    # skip full HP (ยังไม่เริ่มสู้)
+    if abs(state["hp_ratio_diff"]) < 1e-5 and state["p1_hp_ratio"] > 0.99 and state["p2_hp_ratio"] > 0.99:
         time.sleep(0.1)
-
         continue
 
-    # =====================================================
-    # DUPLICATE STATE FILTER
-    # =====================================================
+    if not is_real_fight(state):
+        time.sleep(0.1)
+        continue
 
-    if prev_state is not None:
+    # ================= TERMINAL FLAG =================
+    if state["p1_hp_ratio"] <= 0 or state["p2_hp_ratio"] <= 0:
+        state["done"] = True
 
-        if is_same_state(state, prev_state):
+    # ❗ กัน terminal state หลุดเข้า logic
+    if state.get("done", False) and prev_state is None:
+        continue
 
-            time.sleep(0.1)
+    # ❗ กัน prev_state ที่เป็น terminal
+    if prev_state is not None and prev_state.get("done", False):
+        prev_state = None
+        continue
 
-            continue
+    # ================= DUPLICATE STATE =================
+    if prev_state is not None and is_same_state(state, prev_state):
+        time.sleep(0.1)
+        continue
 
-    # =====================================================
-    # OBSERVE ACTIVE BOOST
-    # =====================================================
+    # ================= BLOCK NORMAL FLOW IF DONE =================
+    if state.get("done", False):
+        prev_state = None
+        continue
 
+    # ================= ACTION =================
     if state.get("is_boost_active", False):
-
-        print(
-            f"👀 OBSERVING BOOST: "
-            f"{state.get('current_action', 'NONE')}"
-        )
-
-        prev_state = state
-
-        time.sleep(0.3)
-
-        continue
-
-    # =====================================================
-    # BOOST CONSTRAINTS
-    # =====================================================
-
-    if not should_allow_boost(state):
 
         write_action("NONE", 1.0)
 
-        prev_state = state
-
         time.sleep(0.3)
 
+        next_state = read_json(STATE_FILE)
+
+        if next_state is None:
+            continue
+
+        if is_same_state(state, next_state):
+            continue
+
+        reward = compute_reward(state, next_state)
+
+        save_dataset(
+            state,
+            "NONE",
+            1.0,
+            reward,
+            next_state
+        )
+
+        prev_state = next_state
+
+        print("👀 OBSERVING ACTIVE BOOST")
+
         continue
+    
+    action, value = model_policy(state)
 
-    # =====================================================
-    # MODEL ACTION
-    # =====================================================
-
-    action = select_action(
-        state,
-        epsilon=0.05
-    )
-
-    # =====================================================
-    # VALUE
-    # =====================================================
-
-    value = get_boost_value(
-        action,
-        state
-    )
-
-    # =====================================================
-    # NO BOOST
-    # =====================================================
 
     if action == "NONE":
 
         write_action("NONE", 1.0)
 
-        prev_state = state
+        time.sleep(0.5)
 
-        time.sleep(0.3)
+        next_state = read_json(STATE_FILE)
+
+        if next_state is None:
+            continue
+
+        # skip stale transition
+        if is_same_state(state, next_state):
+            continue
+
+        reward = compute_reward(
+            state,
+            next_state
+        )
+
+        save_dataset(
+            state,
+            "NONE",
+            1.0,
+            reward,
+            next_state
+        )
+
+        print(f"📊 NONE | reward: {reward:.4f}")
+
+        prev_state = next_state
 
         continue
 
-    # =====================================================
-    # WRITE ACTION
-    # =====================================================
-
+    
     write_action(action, value)
+    last_action_time = time.time()
 
-    print(
-        f"⚡ WRITE ACTION: "
-        f"{action} x{value:.2f}"
-    )
-
-    # =====================================================
-    # WAIT UNITY APPLY
-    # =====================================================
-
-    time.sleep(0.8)
+    time.sleep(1.0)
 
     next_state = read_json(STATE_FILE)
-
+    
+    # invalid transition
     if next_state is None:
-
         continue
-
-    # =====================================================
-    # INVALID TRANSITION
-    # =====================================================
-
+    
     if is_same_state(state, next_state):
 
         print("⚠ SAME STATE TRANSITION")
@@ -463,11 +754,8 @@ while True:
         prev_state = state
 
         continue
-
-    # =====================================================
-    # ACTION VALIDATION
-    # =====================================================
-
+    
+    # action rejected by Unity
     if next_state.get("current_action", "NONE") != action:
 
         print("⚠ ACTION NOT APPLIED")
@@ -475,11 +763,6 @@ while True:
         prev_state = state
 
         continue
-
-    # =====================================================
-    # BOOST VALIDATION
-    # =====================================================
-
     if not next_state.get("is_boost_active", False):
 
         print("⚠ BOOST NOT ACTIVE")
@@ -487,26 +770,27 @@ while True:
         prev_state = state
 
         continue
-
-    # =====================================================
-    # ROUND SAFETY
-    # =====================================================
-
+    # ================= VALIDATE NEXT STATE =================
     if next_state.get("time", 1.0) >= 0.99:
-
         continue
 
+    # ❗ กันข้าม round
     if next_state["time"] > state["time"]:
-
         continue
 
-    # =====================================================
-    # SUCCESS
-    # =====================================================
+    # mark done
+    if next_state["p1_hp_ratio"] <= 0 or next_state["p2_hp_ratio"] <= 0:
+        next_state["done"] = True
 
-    print(
-        f"✅ BOOST APPLIED: "
-        f"{action} x{value:.2f}"
-    )
+    # ❗ กัน terminal ซ้ำใน normal flow
+    if next_state.get("done", False):
+        continue
 
-    prev_state = next_state
+    # ================= SAVE NORMAL =================
+    reward = compute_reward(state, next_state)
+    save_dataset(state, action, value, reward, next_state)
+
+    print(f"📊 {action} | reward: {reward:.4f}")
+
+    # ================= UPDATE =================
+    prev_state = state

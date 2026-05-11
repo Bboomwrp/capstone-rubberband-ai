@@ -578,6 +578,8 @@ while True:
     # ================= ACTION =================
     if state.get("is_boost_active", False):
 
+        write_action("NONE", 1.0)
+
         time.sleep(0.3)
 
         next_state = read_json(STATE_FILE)

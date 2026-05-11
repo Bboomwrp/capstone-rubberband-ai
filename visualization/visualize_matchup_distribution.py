@@ -8,76 +8,181 @@ from utils import (
 )
 
 # =====================================================
-# DATASET
+# DATASETS
 # =====================================================
 
-DATASET = "dataset_v2_clean.jsonl"
+BASELINE_DATASET = "dataset_v2_clean.jsonl"
+
+RL_DATASET = "dataset_rl_clean.jsonl"
 
 # =====================================================
 # LOAD
 # =====================================================
 
-data = load_dataset(DATASET)
+baseline_data = load_dataset(
+    BASELINE_DATASET
+)
 
-rounds = group_by_round(data)
+rl_data = load_dataset(
+    RL_DATASET
+)
 
-# =====================================================
-# COUNT MATCHUPS BY ROUND
-# =====================================================
+baseline_rounds = group_by_round(
+    baseline_data
+)
 
-counter = Counter()
-
-for round_id, samples in rounds.items():
-
-    if len(samples) == 0:
-        continue
-
-    matchup = samples[0].get(
-        "matchup",
-        "unknown"
-    ).lower()
-
-    counter[matchup] += 1
+rl_rounds = group_by_round(
+    rl_data
+)
 
 # =====================================================
-# LABELS
+# COUNT MATCHUPS
 # =====================================================
 
-labels = []
-sizes = []
+def count_matchups(rounds):
 
-total_rounds = sum(counter.values())
+    counter = Counter()
 
-for matchup, count in counter.items():
+    for round_id, samples in rounds.items():
 
-    percent = (
-        count / total_rounds
-    ) * 100
+        if len(samples) == 0:
+            continue
 
-    label = (
-        f"{matchup}\n"
-        f"{percent:.1f}%\n"
-        f"({count} rounds)"
+        matchup = samples[0].get(
+            "matchup",
+            "unknown"
+        ).lower()
+
+        counter[matchup] += 1
+
+    return counter
+
+baseline_counter = count_matchups(
+    baseline_rounds
+)
+
+rl_counter = count_matchups(
+    rl_rounds
+)
+
+# =====================================================
+# BUILD PIE DATA
+# =====================================================
+
+def build_pie(counter):
+
+    labels = []
+    sizes = []
+
+    total_rounds = sum(
+        counter.values()
     )
 
-    labels.append(label)
+    for matchup, count in counter.items():
 
-    sizes.append(count)
+        percent = (
+            count / total_rounds
+        ) * 100
 
-# =====================================================
-# PIE CHART
-# =====================================================
+        label = (
+            f"{matchup}\n"
+            f"{percent:.1f}%\n"
+            f"({count} rounds)"
+        )
 
-plt.figure(figsize=(8, 8))
+        labels.append(label)
 
-plt.pie(
-    sizes,
-    labels=labels,
-    autopct="%1.1f%%"
+        sizes.append(count)
+
+    return labels, sizes
+
+baseline_labels, baseline_sizes = build_pie(
+    baseline_counter
 )
 
-plt.title(
-    "Matchup Distribution by Round"
+rl_labels, rl_sizes = build_pie(
+    rl_counter
 )
+
+# =====================================================
+# PLOT
+# =====================================================
+
+fig, axes = plt.subplots(
+    1,
+    2,
+    figsize=(14, 7)
+)
+
+# =====================================================
+# BACKGROUND
+# =====================================================
+
+bg_color = "#07111f"
+
+fig.patch.set_facecolor(bg_color)
+
+for ax in axes:
+
+    ax.set_facecolor(bg_color)
+
+# =====================================================
+# COLORS
+# =====================================================
+
+colors = [
+    "#1565c0",
+    "#1e88e5",
+    "#42a5f5",
+    "#81d4fa"
+]
+
+# =====================================================
+# BASELINE PIE
+# =====================================================
+
+axes[0].pie(
+    baseline_sizes,
+    labels=baseline_labels,
+    autopct="%1.1f%%",
+    colors=colors,
+    textprops={
+        "color": "white",
+        "fontsize": 10
+    }
+)
+
+axes[0].set_title(
+    "Baseline Matchup Distribution",
+    color="white",
+    fontsize=14
+)
+
+# =====================================================
+# RL PIE
+# =====================================================
+
+axes[1].pie(
+    rl_sizes,
+    labels=rl_labels,
+    autopct="%1.1f%%",
+    colors=colors,
+    textprops={
+        "color": "white",
+        "fontsize": 10
+    }
+)
+
+axes[1].set_title(
+    "RL Inference Matchup Distribution",
+    color="white",
+    fontsize=14
+)
+
+# =====================================================
+# SHOW
+# =====================================================
+
+plt.tight_layout()
 
 plt.show()
