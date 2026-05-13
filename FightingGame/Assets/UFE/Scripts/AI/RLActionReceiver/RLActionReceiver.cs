@@ -219,7 +219,7 @@ public class RLActionReceiver : MonoBehaviour
 
         lastCheckTime = Time.time;
 
-        Debug.Log("🔍 Checking action file...");
+        // Debug.Log("🔍 Checking action file...");
 
         // =====================================================
         // FILE EXISTS
@@ -241,7 +241,7 @@ public class RLActionReceiver : MonoBehaviour
         {
             json = File.ReadAllText(actionPath);
 
-            Debug.Log("📄 JSON: " + json);
+            // Debug.Log("📄 JSON: " + json);
         }
         catch
         {
@@ -265,12 +265,12 @@ public class RLActionReceiver : MonoBehaviour
         {
             action = JsonUtility.FromJson<RLAction>(json);
 
-            Debug.Log(
-                "🧠 Parsed Action: " +
-                action.action +
-                " | value=" +
-                action.value
-            );
+            // Debug.Log(
+            //     "🧠 Parsed Action: " +
+            //     action.action +
+            //     " | value=" +
+            //     action.value
+            // );
         }
         catch
         {
@@ -302,10 +302,10 @@ public class RLActionReceiver : MonoBehaviour
         // APPLY
         // =====================================================
 
-        Debug.Log(
-            "🚀 APPLY ACTION: " +
-            action.action
-        );
+        // Debug.Log(
+        //     "🚀 APPLY ACTION: " +
+        //     action.action
+        // );
 
         ApplyAction(action);
 
@@ -316,10 +316,10 @@ public class RLActionReceiver : MonoBehaviour
             boostTimer = boostDuration;
         }
 
-        Debug.Log(
-            "✅ BOOST STARTED | Duration: " +
-            boostDuration
-        );
+        // Debug.Log(
+        //     "✅ BOOST STARTED | Duration: " +
+        //     boostDuration
+        // );
     }
 
     void ApplyAction(RLAction action)
@@ -407,7 +407,7 @@ public class RLActionReceiver : MonoBehaviour
 
         boostedTarget = null;
 
-        Debug.Log("🔄 Reset multipliers");
+        // Debug.Log("🔄 Reset multipliers");
     }
 
     void ResetActionFile()

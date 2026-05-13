@@ -34,7 +34,7 @@ MODEL_PATH = os.path.join(
 
 DATASET_DIR = os.path.join(BASE_DIR, "dataset")
 os.makedirs(DATASET_DIR, exist_ok=True)
-DATASET_FILE = os.path.join(DATASET_DIR, "dataset_rl.jsonl")
+DATASET_FILE = os.path.join(DATASET_DIR, "demo.jsonl")
 # =========================================================
 # ACTIONS
 # =========================================================

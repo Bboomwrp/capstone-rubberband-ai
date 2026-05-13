@@ -72,6 +72,12 @@ python/models/*.pth
 python/models/*.pt
 python/models/*.onnx
 
+# =========================================================
+# VISUALIZATION
+# =========================================================
+
+python/visualizations/visualize_graphic.zip
+
 # keep folder
 !python/models/.gitkeep
 

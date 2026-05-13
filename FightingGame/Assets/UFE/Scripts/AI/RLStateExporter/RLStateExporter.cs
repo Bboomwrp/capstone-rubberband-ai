@@ -12,12 +12,26 @@ public class RLStateExporter : MonoBehaviour
     private string filePath;
 
     private bool matchStarted = false;
+    private bool isFighting = false;
+    private bool doneSent = false;
 
     private float interval = 1f;
     private float lastTime = 0f;
 
-    private bool isFighting = false;
-    private bool doneSent = false;
+    private int p1HitsLanded = 0;
+    private int p2HitsLanded = 0;
+
+    private int p1HitsReceived = 0;
+    private int p2HitsReceived = 0;
+
+    private int p1Blocks = 0;
+    private int p2Blocks = 0;
+
+    private int p1AttackAttempts = 0;
+    private int p2AttackAttempts = 0;
+
+    private MoveInfo previousP1Move = null;
+    private MoveInfo previousP2Move = null;
 
     void OnEnable()
     {
@@ -25,6 +39,9 @@ public class RLStateExporter : MonoBehaviour
         UFE.OnRoundBegins += OnRoundBegin;
         UFE.OnRoundEnds += OnRoundEnd;
         UFE.OnGameEnds += OnGameEnds;
+        
+        UFE.OnHit += OnHit;
+        UFE.OnBlock += OnBlock;
     }
 
     void OnDisable()
@@ -33,12 +50,47 @@ public class RLStateExporter : MonoBehaviour
         UFE.OnRoundBegins -= OnRoundBegin;
         UFE.OnRoundEnds -= OnRoundEnd;
         UFE.OnGameEnds -= OnGameEnds;
+        
+        UFE.OnHit -= OnHit;
+        UFE.OnBlock -= OnBlock;
+    }
+
+    void OnHit( HitBox hitBox, MoveInfo move, CharacterInfo player )
+    {
+        if (player == p1.myInfo)
+        {
+            p1HitsLanded++;
+            p2HitsReceived++;
+        }
+        else if (player == p2.myInfo)
+        {
+            p2HitsLanded++;
+            p1HitsReceived++;
+        }
+    }
+
+    void OnBlock( HitBox hitBox, MoveInfo move, CharacterInfo player )
+    {
+        // Debug.Log(
+        //     "BLOCK EVENT: " +
+        //     player.characterName
+        // );
+        if (player == p1.myInfo)
+        {
+            p1Blocks++;
+        }
+        else if (player == p2.myInfo)
+        {
+            p2Blocks++;
+        }
     }
 
     void OnGameBegin(CharacterInfo p1Info, CharacterInfo p2Info, StageOptions stage)
     {
         p1 = UFE.GetControlsScript(1);
         p2 = UFE.GetControlsScript(2);
+
+        actionReceiver = FindObjectOfType<RLActionReceiver>();
 
         filePath = Application.persistentDataPath + "/rl_state.json";
 
@@ -52,6 +104,21 @@ public class RLStateExporter : MonoBehaviour
     {
         isFighting = true;
         doneSent = false;
+        
+        p1HitsLanded = 0;
+        p2HitsLanded = 0;
+
+        p1HitsReceived = 0;
+        p2HitsReceived = 0;
+
+        p1Blocks = 0;
+        p2Blocks = 0;
+
+        p1AttackAttempts = 0;
+        p2AttackAttempts = 0;
+
+        previousP1Move = null;
+        previousP2Move = null;
 
         Debug.Log("🔥 Round Started: " + round);
     }
@@ -71,12 +138,30 @@ public class RLStateExporter : MonoBehaviour
         Debug.Log("🟦 Round End: " + winName);
     }
 
+    void OnGameEnds(CharacterInfo winner, CharacterInfo loser)
+    {
+        matchStarted = false;
+        isFighting = false;
+        Debug.Log("🛑 RLStateExporter Stopped");
+    }
+
     void Update()
     {
         if (!matchStarted) return;
         if (p1 == null || p2 == null) return;
 
-        if (!doneSent && (p1.myInfo.currentLifePoints <= 0 || p2.myInfo.currentLifePoints <= 0))
+        bool p1AttackMove = p1.currentMove != null && p1.currentMove.hitBoxes != null && p1.currentMove.hitBoxes.Length > 0;
+        bool p2AttackMove = p2.currentMove != null && p2.currentMove.hitBoxes != null && p2.currentMove.hitBoxes.Length > 0;
+
+        if ( p1AttackMove && previousP1Move != p1.currentMove ) { p1AttackAttempts++; }
+        if ( p2AttackMove && previousP2Move != p2.currentMove ) { p2AttackAttempts++; }
+
+        previousP1Move = p1.currentMove;
+        previousP2Move = p2.currentMove;
+
+        bool isKO = p1.myInfo.currentLifePoints <= 0 || p2.myInfo.currentLifePoints <= 0;
+
+        if (!doneSent && isKO)
         {
             ExportState(true);
             doneSent = true;
@@ -100,20 +185,14 @@ public class RLStateExporter : MonoBehaviour
 
     void ExportState(bool doneFlag)
     {
-        actionReceiver = FindObjectOfType<RLActionReceiver>();
+        string currentAction = "NONE";
+        bool isBoostActive = false;
 
-        string current_action;
-        bool is_boost_active;
         if (actionReceiver != null)
         {
-            current_action = actionReceiver.GetCurrentAction();
+            currentAction = actionReceiver.GetCurrentAction();
 
-            is_boost_active = actionReceiver.IsBoostActive();
-        }
-        else
-        {
-            current_action = "NONE";
-            is_boost_active = false;
+            isBoostActive = actionReceiver.IsBoostActive();
         }
 
         float p1MaxHP = p1.myInfo.lifePoints;
@@ -154,22 +233,26 @@ public class RLStateExporter : MonoBehaviour
         float timeRemaining = timer / maxTime;
         timeRemaining = Mathf.Clamp01(timeRemaining);
 
-        bool isKO = p1HP <= 0 || p2HP <= 0;
-
         RLState state = new RLState();
-        state.hp_ratio_diff = hpRatioDiff;
+        state.time = timeRemaining;
         state.p1_hp_ratio = p1HPRatio;
         state.p2_hp_ratio = p2HPRatio;
+        state.hp_ratio_diff = hpRatioDiff;
         state.p1_gauge_ratio = p1GaugeRatio;
         state.p2_gauge_ratio = p2GaugeRatio;
         state.p1_ultra_gauge_ratio = p1UltraGaugeRatio;
         state.p2_ultra_gauge_ratio = p2UltraGaugeRatio;
         state.p1_character = p1.myInfo.characterName;
         state.p2_character = p2.myInfo.characterName;
+        state.p1_hits_landed = p1HitsLanded;
+        state.p2_hits_landed = p2HitsLanded;
+        state.p1_hits_received = p1HitsReceived;
+        state.p2_hits_received = p2HitsReceived;
+        state.p1_blocks = p1Blocks;
+        state.p2_blocks = p2Blocks;
         state.current_action = current_action;
         state.is_boost_active = is_boost_active;
         state.distance = distance;
-        state.time = timeRemaining;
         state.inMatch = isFighting;
         state.done = doneFlag || isKO;
 
@@ -187,12 +270,6 @@ public class RLStateExporter : MonoBehaviour
         // Debug.Log("🧠 RL Export @" + timer.ToString("F2"));
     }
 
-    void OnGameEnds(CharacterInfo winner, CharacterInfo loser)
-    {
-        matchStarted = false;
-        isFighting = false;
-        Debug.Log("🛑 RLStateExporter Stopped");
-    }
 }
 
 [System.Serializable]
@@ -202,7 +279,6 @@ public class RLState
 
     public float p1_hp_ratio;
     public float p2_hp_ratio;
-
     public float hp_ratio_diff;
 
     public float p1_gauge_ratio;
@@ -215,6 +291,18 @@ public class RLState
 
     public string current_action;
     public bool is_boost_active;
+
+    public int p1_hits_landed;
+    public int p2_hits_landed;
+
+    public int p1_hits_received;
+    public int p2_hits_received;
+
+    public int p1_blocks;
+    public int p2_blocks;
+
+    public int p1_attack_attempts;
+    public int p2_attack_attempts;
 
     public string p1_character;
     public string p2_character;

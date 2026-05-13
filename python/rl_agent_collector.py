@@ -12,7 +12,7 @@ ACTION_FILE = os.path.join(BASE_PATH, "rl_action.json")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(BASE_DIR, "dataset")
 os.makedirs(DATASET_DIR, exist_ok=True)
-DATASET_FILE = os.path.join(DATASET_DIR, "dataset_v2.jsonl")
+DATASET_FILE = os.path.join(DATASET_DIR, "dataset_v3.jsonl")
 
 def read_json(path):
     try:
@@ -139,137 +139,7 @@ def policy(state, epsilon=0.3):
     # OTHERWISE
     return "NONE", 1.0
 
-def compute_reward(state, next_state):
-
-    reward = 0.0
-
-    # =====================================================
-    # 1. DAMAGE IMPACT
-    # =====================================================
-
-    p1_loss = (
-        state["p1_hp_ratio"]
-        - next_state["p1_hp_ratio"]
-    )
-
-    p2_loss = (
-        state["p2_hp_ratio"]
-        - next_state["p2_hp_ratio"]
-    )
-
-    net_damage = p2_loss - p1_loss
-
-    # MUCH STRONGER
-    reward += net_damage * 40.0
-
-    # =====================================================
-    # 2. COMEBACK PROGRESS
-    # =====================================================
-
-    prev_gap = abs(state["hp_ratio_diff"])
-    next_gap = abs(next_state["hp_ratio_diff"])
-
-    gap_change = prev_gap - next_gap
-
-    # direct meaningful comeback
-    reward += gap_change * 60.0
-
-    # =====================================================
-    # 3. SURVIVAL BONUS
-    # =====================================================
-
-    # disadvantaged player survives
-    if state["hp_ratio_diff"] < 0:
-
-        reward += (-p1_loss) * 15.0
-
-    else:
-
-        reward += (-p2_loss) * 15.0
-
-    # =====================================================
-    # 4. RESOURCE MOMENTUM
-    # =====================================================
-
-    p1_resource_gain = (
-        (next_state["p1_gauge_ratio"]
-         - state["p1_gauge_ratio"])
-
-        +
-
-        (next_state["p1_ultra_gauge_ratio"]
-         - state["p1_ultra_gauge_ratio"])
-    )
-
-    p2_resource_gain = (
-        (next_state["p2_gauge_ratio"]
-         - state["p2_gauge_ratio"])
-
-        +
-
-        (next_state["p2_ultra_gauge_ratio"]
-         - state["p2_ultra_gauge_ratio"])
-    )
-
-    if state["hp_ratio_diff"] < 0:
-
-        reward += p1_resource_gain * 12.0
-
-    else:
-
-        reward += p2_resource_gain * 12.0
-
-    # =====================================================
-    # 5. SNOWBALL PENALTY
-    # =====================================================
-
-    # punish runaway advantage
-    if next_gap > prev_gap:
-
-        reward -= (
-            (next_gap - prev_gap)
-            * 35.0
-        )
-
-    # =====================================================
-    # 6. EXTREME STATE PENALTY
-    # =====================================================
-
-    # too one-sided
-    if next_gap > 0.70:
-
-        reward -= 8.0
-
-    # unrealistic HP jump
-    if abs(p1_loss) > 0.45 or abs(p2_loss) > 0.45:
-
-        reward -= 10.0
-
-    # =====================================================
-    # 7. TERMINAL REWARD
-    # =====================================================
-
-    if next_state.get("done", False):
-
-        if next_state["p1_hp_ratio"] <= 0:
-
-            reward -= 30.0
-
-        elif next_state["p2_hp_ratio"] <= 0:
-
-            reward += 30.0
-
-    # =====================================================
-    # NORMALIZATION
-    # =====================================================
-
-    reward = max(min(reward, 30.0), -30.0)
-
-    reward /= 30.0
-
-    return reward
-
-def save_dataset(prev, action, action_value, reward, curr):
+def save_dataset(prev, action, action_value, curr):
 
     global SAMPLE_ID
     global ROUND_ID
@@ -306,7 +176,7 @@ def save_dataset(prev, action, action_value, reward, curr):
 
     metadata = {
 
-        "dataset_version": "v2",
+        "dataset_version": "v3",
         # ---------------------------------------------
         # dataset indexing
         # ---------------------------------------------
@@ -338,8 +208,6 @@ def save_dataset(prev, action, action_value, reward, curr):
         "action": action,
 
         "action_value": action_value,
-
-        "reward": reward,
 
         # ---------------------------------------------
         # state transition
@@ -471,16 +339,10 @@ while True:
 
                 last_terminal_signature = sig
 
-                reward = compute_reward(
-                    prev_state,
-                    state
-                )
-
                 save_dataset(
                     prev_state,
                     "NONE",
                     1.0,
-                    reward,
                     state
                 )
 
@@ -575,7 +437,7 @@ while True:
         prev_state = None
         continue
 
-    # ================= ACTION =================
+    # ================= WHEN BOOST IS ACTIVATING =================
     if state.get("is_boost_active", False):
 
         write_action("NONE", 1.0)
@@ -589,14 +451,14 @@ while True:
 
         if is_same_state(state, next_state):
             continue
-
-        reward = compute_reward(state, next_state)
+        
+        active_action = state.get( "action", "NONE" )
+        value = state.get( "action_value", 1.0 )
 
         save_dataset(
             state,
-            "NONE",
-            1.0,
-            reward,
+            active_action,
+            value,
             next_state
         )
 
@@ -624,20 +486,14 @@ while True:
         if is_same_state(state, next_state):
             continue
 
-        reward = compute_reward(
-            state,
-            next_state
-        )
-
         save_dataset(
             state,
             "NONE",
             1.0,
-            reward,
             next_state
         )
 
-        print(f"📊 NONE | reward: {reward:.4f}")
+        print(f"📊 NONE | value: {value:.2f}")
 
         prev_state = next_state
 
@@ -695,10 +551,9 @@ while True:
         continue
 
     # ================= SAVE NORMAL =================
-    reward = compute_reward(state, next_state)
-    save_dataset(state, action, value, reward, next_state)
+    save_dataset(state, action, value, next_state)
 
-    print(f"📊 {action} | reward: {reward:.4f}")
+    print(f"📊 {action} | value: {value:.2f}")
 
     # ================= UPDATE =================
     prev_state = state
