@@ -45,7 +45,7 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 
 MODEL_PATH = os.path.join(
     MODEL_DIR,
-    "dqn_model_v3_3.pth"
+    "dqn_model_v3_logged.pth"
 )
 
 ACTIONS = [
@@ -243,6 +243,13 @@ optimizer = optim.Adam(
 # =========================================================
 
 print("🚀 TRAIN START")
+
+# =========================================================
+# LOSS HISTORY
+# =========================================================
+
+train_loss_history = []
+val_loss_history = []
 
 for epoch in range(EPOCHS):
 
@@ -490,6 +497,14 @@ for epoch in range(EPOCHS):
 
     avg_train_loss = np.mean(losses)
 
+    train_loss_history.append(
+        float(avg_train_loss)
+    )
+
+    val_loss_history.append(
+        float(avg_val_loss)
+    )
+
     print(
         f"Epoch {epoch+1}/{EPOCHS}"
         f" | Train Loss: "
@@ -497,6 +512,39 @@ for epoch in range(EPOCHS):
         f" | Val Loss: "
         f"{avg_val_loss:.6f}"
     )
+
+# =========================================================
+# SAVE LOSS HISTORY
+# =========================================================
+
+LOSS_HISTORY_PATH = os.path.join(
+    MODEL_DIR,
+    "loss_history.json"
+)
+
+with open(
+    LOSS_HISTORY_PATH,
+    "w"
+) as f:
+
+    json.dump(
+
+        {
+            "train_loss":
+                train_loss_history,
+
+            "val_loss":
+                val_loss_history
+        },
+
+        f,
+        indent=4
+    )
+
+print(
+    f"\n✅ LOSS HISTORY SAVED: "
+    f"{LOSS_HISTORY_PATH}"
+)
 
 # =========================================================
 # SAVE MODEL

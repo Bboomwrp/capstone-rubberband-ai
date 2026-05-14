@@ -10,7 +10,7 @@ from utils import load_dataset
 # =====================================================
 
 BASELINE_DATASET = "dataset_v2_clean.jsonl"
-RL_DATASET = "dataset_rl_clean.jsonl"
+RL_DATASET = "dataset_rl_clean_3.jsonl"
 
 # =====================================================
 # SETTINGS

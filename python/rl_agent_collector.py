@@ -12,7 +12,7 @@ ACTION_FILE = os.path.join(BASE_PATH, "rl_action.json")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(BASE_DIR, "dataset")
 os.makedirs(DATASET_DIR, exist_ok=True)
-DATASET_FILE = os.path.join(DATASET_DIR, "dataset_v3.jsonl")
+DATASET_FILE = os.path.join(DATASET_DIR, "dataset_baseline.jsonl")
 
 def read_json(path):
     try:
@@ -554,7 +554,9 @@ while True:
 
         continue
     
-    action, value = policy(state)
+    # action, value = policy(state)
+    action = "NONE"
+    value = 1.0
 
     if action == "NONE":
 
