@@ -27,6 +27,18 @@ def state_to_vector(state):
         state.get("p2_ultra_gauge_ratio", 0.0),
 
         # =================================================
+        # INTERACTION
+        # =================================================
+
+        state.get("p1_hits_landed", 0) / 64.0,
+        state.get("p2_hits_landed", 0) / 64.0,
+
+        state.get("p1_hits_received", 0) / 64.0,
+        state.get("p2_hits_received", 0) / 64.0,
+
+        state.get("p1_blocks", 0) / 32.0,
+        state.get("p2_blocks", 0) / 32.0,
+        # =================================================
         # SPACING
         # =================================================
 

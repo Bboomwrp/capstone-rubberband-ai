@@ -12,6 +12,23 @@ from dqn_model import DQN
 from utils import state_to_vector
 
 # =========================================================
+# RANDOM SEED
+# =========================================================
+
+SEED = 42
+
+random.seed(SEED)
+
+np.random.seed(SEED)
+
+torch.manual_seed(SEED)
+
+if torch.cuda.is_available():
+
+    torch.cuda.manual_seed(SEED)
+    torch.cuda.manual_seed_all(SEED)
+
+# =========================================================
 # CONFIG
 # =========================================================
 
@@ -20,7 +37,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_FILE = os.path.join(
     BASE_DIR,
     "dataset",
-    "dataset_v2_clean.jsonl"
+    "dataset_v3_rewarded.jsonl"
 )
 
 MODEL_DIR = os.path.join(BASE_DIR, "models")
@@ -28,7 +45,7 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 
 MODEL_PATH = os.path.join(
     MODEL_DIR,
-    "dqn_model.pth"
+    "dqn_model_v3_3.pth"
 )
 
 ACTIONS = [
@@ -38,7 +55,7 @@ ACTIONS = [
     "BOOST_GAUGE"
 ]
 
-STATE_DIM = 9
+STATE_DIM = 15
 ACTION_DIM = len(ACTIONS)
 
 BATCH_SIZE = 128
@@ -49,7 +66,7 @@ GAMMA = 0.95
 LEARNING_RATE = 1e-4
 
 # more epochs after downsampling
-EPOCHS = 50
+EPOCHS = 25
 
 TARGET_UPDATE = 3
 
@@ -68,10 +85,10 @@ print(f"🔥 DEVICE: {DEVICE}")
 # =========================================================
 
 ACTION_WEIGHTS = torch.FloatTensor([
-    0.3,   # NONE
-    1.0,   # BOOST_ATTACK
-    1.2,   # BOOST_DEFENSE
-    2.0    # BOOST_GAUGE
+    0.50,   # NONE
+    1.25,   # BOOST_ATTACK
+    1.10,   # BOOST_DEFENSE
+    0.75    # BOOST_GAUGE
 ]).to(DEVICE)
 
 # =========================================================
@@ -103,7 +120,7 @@ with open(DATASET_FILE, "r", encoding="utf-8") as f:
             if data["action"] == "NONE":
 
                 # keep only 25%
-                if random.random() > 0.25:
+                if random.random() > 0.60:
                     continue
 
             state = state_to_vector(
@@ -151,12 +168,38 @@ with open(DATASET_FILE, "r", encoding="utf-8") as f:
 print(f"✅ Loaded {count} transitions")
 
 # =========================================================
+# TRAIN / VALIDATION SPLIT
+# =========================================================
+
+memory = list(memory)
+
+random.shuffle(memory)
+
+split_idx = int(
+    len(memory) * 0.90
+)
+
+train_memory = memory[:split_idx]
+
+val_memory = memory[split_idx:]
+
+print(
+    f"\n📚 TRAIN SAMPLES: "
+    f"{len(train_memory)}"
+)
+
+print(
+    f"🧪 VAL SAMPLES  : "
+    f"{len(val_memory)}"
+)
+
+# =========================================================
 # ACTION DISTRIBUTION
 # =========================================================
 
 counter = Counter()
 
-for item in memory:
+for item in train_memory:
 
     action_idx = item[1]
 
@@ -195,8 +238,6 @@ optimizer = optim.Adam(
     lr=LEARNING_RATE
 )
 
-criterion = nn.MSELoss()
-
 # =========================================================
 # TRAINING
 # =========================================================
@@ -210,14 +251,14 @@ for epoch in range(EPOCHS):
     losses = []
 
     num_batches = (
-        len(memory)
+        len(train_memory)
         // BATCH_SIZE
     )
 
     for batch_idx in range(num_batches):
 
         batch = random.sample(
-            memory,
+            train_memory,
             BATCH_SIZE
         )
 
@@ -300,11 +341,10 @@ for epoch in range(EPOCHS):
             actions
         ]
 
-        loss = (
-            (
-                current_q
-                - target_q
-            ) ** 2
+        loss = torch.nn.functional.smooth_l1_loss(
+            current_q,
+            target_q,
+            reduction="none"
         )
 
         loss = (
@@ -339,23 +379,140 @@ for epoch in range(EPOCHS):
         )
 
     # =====================================================
+    # VALIDATION
+    # =====================================================
+
+    policy_net.eval()
+
+    val_losses = []
+
+    with torch.no_grad():
+
+        val_batches = max(
+            1,
+            len(val_memory) // BATCH_SIZE
+        )
+
+        for _ in range(val_batches):
+
+            batch = random.sample(
+                val_memory,
+                BATCH_SIZE
+            )
+
+            states = np.array(
+                [x[0] for x in batch]
+            )
+
+            actions = np.array(
+                [x[1] for x in batch]
+            )
+
+            rewards = np.array(
+                [x[2] for x in batch]
+            )
+
+            next_states = np.array(
+                [x[3] for x in batch]
+            )
+
+            dones = np.array(
+                [x[4] for x in batch]
+            )
+
+            states = torch.FloatTensor(
+                states
+            ).to(DEVICE)
+
+            actions = torch.LongTensor(
+                actions
+            ).to(DEVICE)
+
+            rewards = torch.FloatTensor(
+                rewards
+            ).to(DEVICE)
+
+            next_states = torch.FloatTensor(
+                next_states
+            ).to(DEVICE)
+
+            dones = torch.FloatTensor(
+                dones
+            ).to(DEVICE)
+
+            current_q = policy_net(
+                states
+            )
+
+            current_q = current_q.gather(
+                1,
+                actions.unsqueeze(1)
+            ).squeeze(1)
+
+            next_q = target_net(
+                next_states
+            )
+
+            max_next_q = next_q.max(1)[0]
+
+            target_q = rewards + (
+                GAMMA
+                * max_next_q
+                * (1 - dones)
+            )
+
+            sample_weights = ACTION_WEIGHTS[
+                actions
+            ]
+
+            val_loss = torch.nn.functional.smooth_l1_loss(
+                current_q,
+                target_q,
+                reduction="none"
+            )
+
+            val_loss = (
+                val_loss
+                * sample_weights
+            ).mean()
+
+            val_losses.append(
+                val_loss.item()
+            )
+
+    avg_val_loss = np.mean(
+        val_losses
+    )
+
+    # =====================================================
     # LOG
     # =====================================================
 
-    avg_loss = np.mean(losses)
+    avg_train_loss = np.mean(losses)
 
     print(
-        f"Epoch {epoch+1}/{EPOCHS} "
-        f"| Loss: {avg_loss:.6f}"
+        f"Epoch {epoch+1}/{EPOCHS}"
+        f" | Train Loss: "
+        f"{avg_train_loss:.6f}"
+        f" | Val Loss: "
+        f"{avg_val_loss:.6f}"
     )
 
 # =========================================================
 # SAVE MODEL
 # =========================================================
 
-torch.save(
-    policy_net.state_dict(),
-    MODEL_PATH
-)
+torch.save({
+
+    "model_state_dict":
+        policy_net.state_dict(),
+
+    "state_dim":
+        STATE_DIM,
+
+    "actions":
+        ACTIONS,
+
+}, MODEL_PATH)
 
 print(f"\n✅ MODEL SAVED: {MODEL_PATH}")

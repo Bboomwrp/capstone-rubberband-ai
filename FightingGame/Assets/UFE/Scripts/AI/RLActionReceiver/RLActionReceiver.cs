@@ -20,7 +20,7 @@ public class RLActionReceiver : MonoBehaviour
     private float cooldownTimer = 0f;
 
     private string currentAction = "NONE";
-
+    private float currentValue = 1.0f;
     private bool isMatchActive = false;
 
     private bool cooldownLogged = false;
@@ -79,6 +79,7 @@ public class RLActionReceiver : MonoBehaviour
         isMatchActive = true;
 
         currentAction = "NONE";
+        currentValue = 1.0f;
 
         boostTimer = 0f;
         cooldownTimer = 0f;
@@ -97,6 +98,7 @@ public class RLActionReceiver : MonoBehaviour
         isMatchActive = false;
 
         currentAction = "NONE";
+        currentValue = 1.0f;
 
         boostTimer = 0f;
         cooldownTimer = 0f;
@@ -140,12 +142,14 @@ public class RLActionReceiver : MonoBehaviour
                 Debug.Log("🛑 BOOST CANCELLED");
 
                 ResetAll();
+                ResetActionFile();
 
                 boostTimer = 0f;
 
                 cooldownTimer = cooldownDuration;
 
                 currentAction = "NONE";
+                currentValue = 1.0f;
 
                 return;
             }
@@ -165,7 +169,8 @@ public class RLActionReceiver : MonoBehaviour
             if (boostTimer <= 0)
             {
                 ResetAll();
-
+                ResetActionFile();
+                
                 cooldownTimer = cooldownDuration;
 
                 Debug.Log("⏳ BOOST ENDED");
@@ -310,7 +315,7 @@ public class RLActionReceiver : MonoBehaviour
         ApplyAction(action);
 
         currentAction = action.action;
-
+        currentValue = action.value;
         if (action.action != "NONE")
         {
             boostTimer = boostDuration;
@@ -526,6 +531,11 @@ public class RLActionReceiver : MonoBehaviour
     public string GetCurrentAction()
     {
         return currentAction;
+    }
+
+    public float GetCurrentValue()
+    {
+        return currentValue;
     }
 
     public bool IsBoostActive()

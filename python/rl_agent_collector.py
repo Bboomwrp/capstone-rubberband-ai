@@ -49,19 +49,14 @@ def write_action(action, value):
 
     print("❌ FAILED TO WRITE ACTION")
 
-def policy(state, epsilon=0.3):
+def policy( state, epsilon=0.18):
 
-    actions = [
-        "NONE",
-        "BOOST_ATTACK",
-        "BOOST_DEFENSE",
-        "BOOST_GAUGE"
-    ]
+    p1_hp = state["p1_hp_ratio"]
+    p2_hp = state["p2_hp_ratio"]
 
-    p1_hp_ratio = state["p1_hp_ratio"]
-    p2_hp_ratio = state["p2_hp_ratio"]
-
-    hp_ratio_diff = abs(state["hp_ratio_diff"])
+    hp_gap = abs(
+        state["hp_ratio_diff"]
+    )
 
     p1_gauge = state["p1_gauge_ratio"]
     p2_gauge = state["p2_gauge_ratio"]
@@ -69,74 +64,163 @@ def policy(state, epsilon=0.3):
     p1_ultra = state["p1_ultra_gauge_ratio"]
     p2_ultra = state["p2_ultra_gauge_ratio"]
 
-    gauge_diff = p1_gauge - p2_gauge
-    ultra_diff = p1_ultra - p2_ultra
+    gauge_gap = abs(
+        p1_gauge - p2_gauge
+    )
 
+    ultra_gap = abs(
+        p1_ultra - p2_ultra
+    )
+
+    time_left = state["time"]
+
+    # =================================================
+    # PRESSURE ESTIMATION
+    # =================================================
+
+    pressure_diff = abs(
+
+        state["p1_hits_received"]
+
+        -
+
+        state["p1_hits_landed"]
+    )
+
+    # =================================================
     # CONSTRAINTS
+    # =================================================
 
-    # EARLY GAME
-    # no boost at full/opening HP
+    # EARLY ROUND
+    # avoid immediate rubberband
 
-    if p1_hp_ratio > 0.90 and p2_hp_ratio > 0.90:
+    if (p1_hp > 0.90 and p2_hp > 0.90) or time_left > 0.92:
         return "NONE", 1.0
 
-    # CLOSE MATCH
-    # no rubberband if nearly balanced
+    # VERY CLOSE MATCH
+    # no unnecessary intervention
 
-    if hp_ratio_diff < 0.075:
+    if hp_gap < 0.10:
         return "NONE", 1.0
 
     # CRITICAL FINISH
-    # let skill decide ending
+    # let gameplay decide ending
 
-    if p1_hp_ratio < 0.10 and p2_hp_ratio < 0.10:
+    if p1_hp < 0.10 and p2_hp < 0.10:
         return "NONE", 1.0
 
+    # =================================================
     # RANDOM EXPLORATION
+    # =================================================
 
     if random.random() < epsilon:
 
-        action = random.choice(actions)
+        actions = [
+            "NONE",
+            "BOOST_ATTACK",
+            "BOOST_DEFENSE",
+            "BOOST_GAUGE"
+        ]
 
-        # adaptive random value
-        if hp_ratio_diff > 0.30:
+        weights = [
+            0.40,  # NONE
+            0.35,  # ATTACK
+            0.15,  # DEFENSE
+            0.10   # GAUGE
+        ]
+
+        action = random.choices(
+            actions,
+            weights=weights,
+            k=1
+        )[0]
+
+        # adaptive boost strength
+
+        if hp_gap > 0.35:
             value = 1.30
-        elif hp_ratio_diff > 0.20:
+
+        elif hp_gap > 0.22:
             value = 1.20
-        elif hp_ratio_diff > 0.10:
+
+        elif hp_gap > 0.12:
             value = 1.10
+
         else:
             value = 1.05
 
         return action, value
 
-    # HEURISTIC POLICY
-
+    # =================================================
     # HEAVY DISADVANTAGE
-    # prioritize comeback damage
+    # =================================================
 
-    if hp_ratio_diff > 0.30:
+    if hp_gap > 0.35:
+
+        # under strong pressure
+        # stabilize survival first
+
+        if pressure_diff > 4:
+
+            return "BOOST_DEFENSE", 1.30
+
+        # otherwise encourage comeback offense
+
         return "BOOST_ATTACK", 1.30
 
-    # MEDIUM DISADVANTAGE
-    # defensive stabilization
+    # =================================================
+    # MID DISADVANTAGE
+    # =================================================
 
-    elif hp_ratio_diff > 0.18:
-        return "BOOST_DEFENSE", 1.20
+    elif hp_gap > 0.20:
 
-    # RESOURCE DISADVANTAGE
-    # encourage meter comeback
+        # currently getting overwhelmed
 
-    elif gauge_diff < -0.25 or ultra_diff < -0.25:
-        return "BOOST_GAUGE", 1.25
+        if pressure_diff > 2:
 
+            return "BOOST_DEFENSE", 1.20
+
+        # offensive momentum possible
+
+        return "BOOST_ATTACK", 1.20
+
+    # =================================================
+    # RESOURCE COMEBACK
+    # =================================================
+
+    elif (
+        gauge_gap > 0.25
+        or
+        ultra_gap > 0.25
+    ):
+
+        # late game:
+        # gauge less valuable
+
+        if time_left < 0.72 or min(p1_hp, p2_hp) < 0.20:
+
+            return "BOOST_ATTACK", 1.10
+
+        return "BOOST_GAUGE", 1.15
+
+    # =================================================
     # LIGHT DISADVANTAGE
-    # smaller offensive momentum
+    # =================================================
 
-    elif hp_ratio_diff > 0.10:
+    elif hp_gap > 0.10:
+
+        # mild pressure -> stabilize
+
+        if pressure_diff > 3:
+
+            return "BOOST_DEFENSE", 1.10
+
         return "BOOST_ATTACK", 1.10
 
-    # OTHERWISE
+    # =================================================
+    # DEFAULT
+    # =================================================
+
     return "NONE", 1.0
 
 def save_dataset(prev, action, action_value, curr):
@@ -194,12 +278,6 @@ def save_dataset(prev, action, action_value, curr):
         "p1_character": p1_character,
 
         "p2_character": p2_character,
-
-        # ---------------------------------------------
-        # timestamp
-        # ---------------------------------------------
-
-        "timestamp": time.time(),
 
         # ---------------------------------------------
         # gameplay context
@@ -339,12 +417,7 @@ while True:
 
                 last_terminal_signature = sig
 
-                save_dataset(
-                    prev_state,
-                    "NONE",
-                    1.0,
-                    state
-                )
+                save_dataset(prev_state, "NONE", 1.0, state)
 
                 print("🏁 TERMINAL SAVED")
 
@@ -440,7 +513,21 @@ while True:
     # ================= WHEN BOOST IS ACTIVATING =================
     if state.get("is_boost_active", False):
 
-        write_action("NONE", 1.0)
+        active_action = state.get(
+            "current_action",
+            "NONE"
+        )
+
+        value = state.get(
+            "action_value",
+            1.0
+        )
+
+        # keep current boost action active
+        write_action(
+            active_action,
+            value
+        )
 
         time.sleep(0.3)
 
@@ -451,9 +538,6 @@ while True:
 
         if is_same_state(state, next_state):
             continue
-        
-        active_action = state.get( "action", "NONE" )
-        value = state.get( "action_value", 1.0 )
 
         save_dataset(
             state,
@@ -464,12 +548,13 @@ while True:
 
         prev_state = next_state
 
-        print("👀 OBSERVING ACTIVE BOOST")
+        print(
+            f"👀 OBSERVING ACTIVE BOOST: {active_action}"
+        )
 
         continue
     
     action, value = policy(state)
-
 
     if action == "NONE":
 
@@ -493,7 +578,7 @@ while True:
             next_state
         )
 
-        print(f"📊 NONE | value: {value:.2f}")
+        print(f"📊 NONE")
 
         prev_state = next_state
 

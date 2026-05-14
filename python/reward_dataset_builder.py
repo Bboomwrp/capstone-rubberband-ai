@@ -17,7 +17,7 @@ DATASET_DIR = os.path.join(
 
 RAW_DATASET = os.path.join(
     DATASET_DIR,
-    "dataset_v3_raw.jsonl"
+    "dataset_v3_clean.jsonl"
 )
 
 OUTPUT_DATASET = os.path.join(
@@ -29,38 +29,20 @@ OUTPUT_DATASET = os.path.join(
 # WEIGHTS
 # =====================================================
 
-W_COMEBACK = 0.35
-W_DAMAGE = 0.25
-W_RESOURCE = 0.15
+W_COMEBACK = 0.45
+W_SNOWBALL = 0.25
 W_PACING = 0.15
+W_RESOURCE = 0.05
 W_TERMINAL = 0.10
 
 # =====================================================
 # COMPUTE REWARD
 # =====================================================
 
-def compute_reward(
-    state,
-    next_state
-):
-
-    # =============================================
-    # HP LOSSES
-    # =============================================
-
-    p1_loss = (
-
-        state["p1_hp_ratio"] - next_state["p1_hp_ratio"]
-    )
-
-    p2_loss = (
-
-        state["p2_hp_ratio"] - next_state["p2_hp_ratio"]
-    )
-
-    # =============================================
-    # GAP REDUCTION
-    # =============================================
+def compute_reward(action, state, next_state):
+    # =================================================
+    # HP GAP REDUCTION
+    # =================================================
 
     prev_gap = abs(
         state["hp_ratio_diff"]
@@ -80,72 +62,87 @@ def compute_reward(
         1.0
     )
 
-    # =============================================
-    # DAMAGE BALANCE
-    # =============================================
+    # =================================================
+    # SNOWBALL PENALTY
+    # =================================================
 
-    net_damage = (
-        p2_loss - p1_loss
-    )
-
-    damage_reward = np.clip(
-        net_damage,
-        -1.0,
-        1.0
-    )
-
-    # =============================================
-    # RESOURCE MOMENTUM
-    # =============================================
-
-    p1_resource = (
-
-        (next_state["p1_gauge_ratio"] - state["p1_gauge_ratio"])
-
-        +
-
-        (next_state["p1_ultra_gauge_ratio"] - state["p1_ultra_gauge_ratio"])
-    )
-
-    p2_resource = (
-
-        (next_state["p2_gauge_ratio"] - state["p2_gauge_ratio"])
-
-        +
-
-        (next_state["p2_ultra_gauge_ratio"] - state["p2_ultra_gauge_ratio"])
-    )
-
-    resource_reward = np.clip(
-        p1_resource + p2_resource,
-        -1.0,
-        1.0
-    )
-
-    # =============================================
-    # PACING / INTERACTION
-    # =============================================
-
-    interaction = (
-
-        abs(p1_loss)
-        + abs(p2_loss)
-
-        +
-
-        abs(p1_resource)
-        + abs(p2_resource)
-    )
-
-    pacing_reward = np.clip(
-        interaction,
+    snowball_penalty = np.clip(
+        next_gap - prev_gap,
         0.0,
         1.0
     )
 
-    # =============================================
+    # =================================================
+    # INTERACTION / PACING
+    # =================================================
+
+    p1_hp_change = abs(
+
+        next_state["p1_hp_ratio"]
+        -
+        state["p1_hp_ratio"]
+    )
+
+    p2_hp_change = abs(
+
+        next_state["p2_hp_ratio"]
+        -
+        state["p2_hp_ratio"]
+    )
+
+    p1_gauge_change = abs(
+
+        next_state["p1_gauge_ratio"]
+        -
+        state["p1_gauge_ratio"]
+    )
+
+    p2_gauge_change = abs(
+
+        next_state["p2_gauge_ratio"]
+        -
+        state["p2_gauge_ratio"]
+    )
+
+    interaction_strength = (
+
+        p1_hp_change
+        +
+        p2_hp_change
+
+        +
+        0.5 * (
+            p1_gauge_change
+            +
+            p2_gauge_change
+        )
+    )
+
+    pacing_reward = np.clip(
+        interaction_strength,
+        0.0,
+        1.0
+    )
+
+    # =================================================
+    # RESOURCE ACTIVITY
+    # =================================================
+
+    resource_reward = np.clip(
+
+        (
+            p1_gauge_change
+            +
+            p2_gauge_change
+        ),
+
+        0.0,
+        1.0
+    )
+
+    # =================================================
     # TERMINAL QUALITY
-    # =============================================
+    # =================================================
 
     terminal_reward = 0.0
 
@@ -155,10 +152,10 @@ def compute_reward(
     ):
 
         final_gap = abs(
-            next_state[
-                "hp_ratio_diff"
-            ]
+            next_state["hp_ratio_diff"]
         )
+
+        # closer ending = better balance
 
         terminal_reward = np.clip(
             1.0 - final_gap,
@@ -166,35 +163,178 @@ def compute_reward(
             1.0
         )
 
-    # =============================================
-    # FINAL
-    # =============================================
+    # =================================================
+    # FINAL WEIGHTED REWARD
+    # =================================================
 
     reward = (
 
-        comeback_reward
-        * W_COMEBACK
+        W_COMEBACK
+        * comeback_reward
+
+        -
+
+        W_SNOWBALL
+        * snowball_penalty
 
         +
 
-        damage_reward
-        * W_DAMAGE
+        W_PACING
+        * pacing_reward
 
         +
 
-        resource_reward
-        * W_RESOURCE
+        W_RESOURCE
+        * resource_reward
 
         +
 
-        pacing_reward
-        * W_PACING
-
-        +
-
-        terminal_reward
-        * W_TERMINAL
+        W_TERMINAL
+        * terminal_reward
     )
+
+    # =====================================================
+    # ACTION EFFECTIVENESS
+    # =====================================================
+
+    # determine boosted player
+    # RLActionReceiver boosts disadvantaged side
+
+    boosted_is_p1 = (
+        state["p1_hp_ratio"]
+        <
+        state["p2_hp_ratio"]
+    )
+
+    if boosted_is_p1:
+
+        boosted_hp_before = state["p1_hp_ratio"]
+        boosted_hp_after = next_state["p1_hp_ratio"]
+
+        opponent_hp_before = state["p2_hp_ratio"]
+        opponent_hp_after = next_state["p2_hp_ratio"]
+
+        boosted_gauge_before = (
+            state["p1_gauge_ratio"]
+            +
+            state["p1_ultra_gauge_ratio"]
+        )
+
+        boosted_gauge_after = (
+            next_state["p1_gauge_ratio"]
+            +
+            next_state["p1_ultra_gauge_ratio"]
+        )
+
+        boosted_hits_received_before = (
+            state["p1_hits_received"]
+        )
+
+        boosted_hits_received_after = (
+            next_state["p1_hits_received"]
+        )
+
+    else:
+
+        boosted_hp_before = state["p2_hp_ratio"]
+        boosted_hp_after = next_state["p2_hp_ratio"]
+
+        opponent_hp_before = state["p1_hp_ratio"]
+        opponent_hp_after = next_state["p1_hp_ratio"]
+
+        boosted_gauge_before = (
+            state["p2_gauge_ratio"]
+            +
+            state["p2_ultra_gauge_ratio"]
+        )
+
+        boosted_gauge_after = (
+            next_state["p2_gauge_ratio"]
+            +
+            next_state["p2_ultra_gauge_ratio"]
+        )
+
+        boosted_hits_received_before = (
+            state["p2_hits_received"]
+        )
+
+        boosted_hits_received_after = (
+            next_state["p2_hits_received"]
+        )
+
+    # =====================================================
+    # BOOST ATTACK
+    # =====================================================
+
+    if action == "BOOST_ATTACK":
+
+        damage_done = max(
+            0.0,
+            opponent_hp_before
+            -
+            opponent_hp_after
+        )
+
+        reward += (
+            damage_done
+            * 0.25
+        )
+
+    # =====================================================
+    # BOOST DEFENSE
+    # =====================================================
+
+    elif action == "BOOST_DEFENSE":
+
+        damage_taken = max(
+            0.0,
+            boosted_hp_before
+            -
+            boosted_hp_after
+        )
+
+        pressure_taken = max(
+            0,
+            boosted_hits_received_after
+            -
+            boosted_hits_received_before
+        )
+
+        # reward only if actually pressured
+        if pressure_taken > 0:
+
+            defense_success = max(
+                0.0,
+                0.05 - damage_taken
+            )
+
+            reward += (
+                defense_success
+                * 0.12
+            )
+
+    # =====================================================
+    # BOOST GAUGE
+    # =====================================================
+
+    elif action == "BOOST_GAUGE":
+
+        gauge_gain = max(
+            0.0,
+            boosted_gauge_after
+            -
+            boosted_gauge_before
+        )
+
+        reward += (
+            gauge_gain
+            * 0.10
+        )
+
+
+    # =================================================
+    # NORMALIZE
+    # =================================================
 
     reward = np.clip(
         reward,
@@ -219,6 +359,7 @@ for line in lines:
     sample = json.loads(line)
 
     reward = compute_reward(
+        sample["action"],
         sample["state"],
         sample["next_state"]
     )

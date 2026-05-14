@@ -27,12 +27,6 @@ public class RLStateExporter : MonoBehaviour
     private int p1Blocks = 0;
     private int p2Blocks = 0;
 
-    private int p1AttackAttempts = 0;
-    private int p2AttackAttempts = 0;
-
-    private MoveInfo previousP1Move = null;
-    private MoveInfo previousP2Move = null;
-
     void OnEnable()
     {
         UFE.OnGameBegin += OnGameBegin;
@@ -114,12 +108,6 @@ public class RLStateExporter : MonoBehaviour
         p1Blocks = 0;
         p2Blocks = 0;
 
-        p1AttackAttempts = 0;
-        p2AttackAttempts = 0;
-
-        previousP1Move = null;
-        previousP2Move = null;
-
         Debug.Log("🔥 Round Started: " + round);
     }
 
@@ -150,15 +138,6 @@ public class RLStateExporter : MonoBehaviour
         if (!matchStarted) return;
         if (p1 == null || p2 == null) return;
 
-        bool p1AttackMove = p1.currentMove != null && p1.currentMove.hitBoxes != null && p1.currentMove.hitBoxes.Length > 0;
-        bool p2AttackMove = p2.currentMove != null && p2.currentMove.hitBoxes != null && p2.currentMove.hitBoxes.Length > 0;
-
-        if ( p1AttackMove && previousP1Move != p1.currentMove ) { p1AttackAttempts++; }
-        if ( p2AttackMove && previousP2Move != p2.currentMove ) { p2AttackAttempts++; }
-
-        previousP1Move = p1.currentMove;
-        previousP2Move = p2.currentMove;
-
         bool isKO = p1.myInfo.currentLifePoints <= 0 || p2.myInfo.currentLifePoints <= 0;
 
         if (!doneSent && isKO)
@@ -186,11 +165,14 @@ public class RLStateExporter : MonoBehaviour
     void ExportState(bool doneFlag)
     {
         string currentAction = "NONE";
+        float actionValue = 1.0f;
         bool isBoostActive = false;
 
         if (actionReceiver != null)
         {
             currentAction = actionReceiver.GetCurrentAction();
+
+            actionValue = actionReceiver.GetCurrentValue();
 
             isBoostActive = actionReceiver.IsBoostActive();
         }
@@ -233,6 +215,8 @@ public class RLStateExporter : MonoBehaviour
         float timeRemaining = timer / maxTime;
         timeRemaining = Mathf.Clamp01(timeRemaining);
 
+        bool isKO = p1.myInfo.currentLifePoints <= 0 || p2.myInfo.currentLifePoints <= 0;
+
         RLState state = new RLState();
         state.time = timeRemaining;
         state.p1_hp_ratio = p1HPRatio;
@@ -250,8 +234,9 @@ public class RLStateExporter : MonoBehaviour
         state.p2_hits_received = p2HitsReceived;
         state.p1_blocks = p1Blocks;
         state.p2_blocks = p2Blocks;
-        state.current_action = current_action;
-        state.is_boost_active = is_boost_active;
+        state.current_action = currentAction;
+        state.action_value = actionValue;
+        state.is_boost_active = isBoostActive;
         state.distance = distance;
         state.inMatch = isFighting;
         state.done = doneFlag || isKO;
@@ -290,6 +275,7 @@ public class RLState
     public float distance;
 
     public string current_action;
+    public float action_value;
     public bool is_boost_active;
 
     public int p1_hits_landed;
@@ -300,9 +286,6 @@ public class RLState
 
     public int p1_blocks;
     public int p2_blocks;
-
-    public int p1_attack_attempts;
-    public int p2_attack_attempts;
 
     public string p1_character;
     public string p2_character;

@@ -29,12 +29,12 @@ ACTION_FILE = os.path.join(
 MODEL_PATH = os.path.join(
     BASE_DIR,
     "models",
-    "dqn_model.pth"
+    "dqn_model_v3_3.pth"
 )
 
 DATASET_DIR = os.path.join(BASE_DIR, "dataset")
 os.makedirs(DATASET_DIR, exist_ok=True)
-DATASET_FILE = os.path.join(DATASET_DIR, "demo.jsonl")
+DATASET_FILE = os.path.join(DATASET_DIR, "dataset_rl_raw_3.jsonl")
 # =========================================================
 # ACTIONS
 # =========================================================
@@ -60,10 +60,22 @@ print(f"🔥 DEVICE: {DEVICE}")
 # LOAD MODEL
 # =========================================================
 
-model = DQN(9, len(ACTIONS)).to(DEVICE)
+checkpoint = torch.load(
+    MODEL_PATH,
+    map_location=DEVICE
+)
+
+STATE_DIM = checkpoint["state_dim"]
+
+ACTIONS = checkpoint["actions"]
+
+model = DQN(
+    STATE_DIM,
+    len(ACTIONS)
+).to(DEVICE)
 
 model.load_state_dict(
-    torch.load(MODEL_PATH, map_location=DEVICE)
+    checkpoint["model_state_dict"]
 )
 
 model.eval()
@@ -109,259 +121,173 @@ def write_action(action, value):
 
     print("❌ FAILED TO WRITE ACTION")
 
-def adaptive_boost_value(state, action):
+def model_policy( state, confidence_threshold=0.35):
+    p1_hp = state["p1_hp_ratio"]
+    p2_hp = state["p2_hp_ratio"]
 
-    hp_ratio_diff = abs(
+    hp_gap = abs(
         state["hp_ratio_diff"]
     )
 
-    # =====================================================
-    # BASE INTENSITY
-    # =====================================================
+    p1_gauge = state["p1_gauge_ratio"]
+    p2_gauge = state["p2_gauge_ratio"]
 
-    if hp_ratio_diff > 0.40:
+    p1_ultra = state["p1_ultra_gauge_ratio"]
+    p2_ultra = state["p2_ultra_gauge_ratio"]
 
-        intensity = 1.35
-
-    elif hp_ratio_diff > 0.30:
-
-        intensity = 1.25
-
-    elif hp_ratio_diff > 0.20:
-
-        intensity = 1.18
-
-    elif hp_ratio_diff > 0.10:
-
-        intensity = 1.10
-
-    else:
-
-        intensity = 1.05
-
-    # =====================================================
-    # ACTION-SPECIFIC ADJUSTMENT
-    # =====================================================
-
-    if action == "BOOST_ATTACK":
-
-        value = intensity
-
-    elif action == "BOOST_DEFENSE":
-
-        value = intensity
-
-    elif action == "BOOST_GAUGE":
-
-        value = min(intensity + 0.05, 1.35)
-
-    else:
-
-        value = 1.0
-
-    # =====================================================
-    # CLAMP
-    # =====================================================
-
-    value = max(
-        1.0,
-        min(value, 1.40)
+    gauge_gap = abs(
+        p1_gauge - p2_gauge
     )
 
-    return round(value, 2)
+    ultra_gap = abs(
+        p1_ultra - p2_ultra
+    )
 
-def model_policy(state, epsilon=0.0):
+    time_left = state["time"]
 
-    # =====================================================
+    # =================================================
+    # PRESSURE ESTIMATION
+    # =================================================
+
+    pressure_diff = abs(
+
+        state["p1_hits_received"]
+
+        -
+
+        state["p1_hits_landed"]
+    )
+
+    # =================================================
     # CONSTRAINTS
-    # =====================================================
+    # =================================================
 
-    p1_hp_ratio = state["p1_hp_ratio"]
-    p2_hp_ratio = state["p2_hp_ratio"]
+    if (
+        p1_hp > 0.90
+        and
+        p2_hp > 0.90
+    ) or time_left > 0.92:
 
-    hp_ratio_diff = abs(
-        state["hp_ratio_diff"]
-    )
-
-    # EARLY GAME
-    if p1_hp_ratio > 0.90 and p2_hp_ratio > 0.90:
         return "NONE", 1.0
 
-    # CLOSE MATCH
-    if hp_ratio_diff < 0.075:
+    if hp_gap < 0.075:
+
         return "NONE", 1.0
 
-    # CRITICAL FINISH
-    if p1_hp_ratio < 0.10 and p2_hp_ratio < 0.10:
+    if (
+        p1_hp < 0.10
+        and
+        p2_hp < 0.10
+    ):
+
         return "NONE", 1.0
 
-    # =====================================================
-    # RANDOM EXPLORATION
-    # =====================================================
+    # =================================================
+    # MODEL INFERENCE
+    # =================================================
 
-    if random.random() < epsilon:
+    state_vector = torch.FloatTensor(
+        [state_to_vector(state)]
+    ).to(DEVICE)
 
-        action = random.choice(ACTIONS)
+    with torch.no_grad():
 
-    else:
+        q_values = model(state_vector)
 
-        state_vector = torch.FloatTensor(
-            [state_to_vector(state)]
-        ).to(DEVICE)
+        raw_q = q_values.squeeze(0).cpu().numpy()
 
-        with torch.no_grad():
-
-            q_values = model(state_vector)
-
-            # best action
-            action_idx = torch.argmax(
-                q_values
-            ).item()
-
-            action = ACTIONS[action_idx]
-
-    # =====================================================
-    # ADAPTIVE BOOST VALUE
-    # =====================================================
-
-    value = adaptive_boost_value(
-        state,
-        action
-    )
-
-    return action, value
-
-def compute_reward(state, next_state):
-
-    reward = 0.0
-
-    # =====================================================
-    # 1. DAMAGE IMPACT
-    # =====================================================
-
-    p1_loss = (
-        state["p1_hp_ratio"]
-        - next_state["p1_hp_ratio"]
-    )
-
-    p2_loss = (
-        state["p2_hp_ratio"]
-        - next_state["p2_hp_ratio"]
-    )
-
-    net_damage = p2_loss - p1_loss
-
-    # MUCH STRONGER
-    reward += net_damage * 40.0
-
-    # =====================================================
-    # 2. COMEBACK PROGRESS
-    # =====================================================
-
-    prev_gap = abs(state["hp_ratio_diff"])
-    next_gap = abs(next_state["hp_ratio_diff"])
-
-    gap_change = prev_gap - next_gap
-
-    # direct meaningful comeback
-    reward += gap_change * 60.0
-
-    # =====================================================
-    # 3. SURVIVAL BONUS
-    # =====================================================
-
-    # disadvantaged player survives
-    if state["hp_ratio_diff"] < 0:
-
-        reward += (-p1_loss) * 15.0
-
-    else:
-
-        reward += (-p2_loss) * 15.0
-
-    # =====================================================
-    # 4. RESOURCE MOMENTUM
-    # =====================================================
-
-    p1_resource_gain = (
-        (next_state["p1_gauge_ratio"]
-         - state["p1_gauge_ratio"])
-
-        +
-
-        (next_state["p1_ultra_gauge_ratio"]
-         - state["p1_ultra_gauge_ratio"])
-    )
-
-    p2_resource_gain = (
-        (next_state["p2_gauge_ratio"]
-         - state["p2_gauge_ratio"])
-
-        +
-
-        (next_state["p2_ultra_gauge_ratio"]
-         - state["p2_ultra_gauge_ratio"])
-    )
-
-    if state["hp_ratio_diff"] < 0:
-
-        reward += p1_resource_gain * 12.0
-
-    else:
-
-        reward += p2_resource_gain * 12.0
-
-    # =====================================================
-    # 5. SNOWBALL PENALTY
-    # =====================================================
-
-    # punish runaway advantage
-    if next_gap > prev_gap:
-
-        reward -= (
-            (next_gap - prev_gap)
-            * 35.0
+        print(
+            "\n🧠 Q VALUES"
         )
 
-    # =====================================================
-    # 6. EXTREME STATE PENALTY
-    # =====================================================
+        for i, act in enumerate(ACTIONS):
 
-    # too one-sided
-    if next_gap > 0.70:
+            print(
+                f"{act:15s}: "
+                f"{raw_q[i]:+.4f}"
+            )
 
-        reward -= 8.0
+        print(
+            f"📊 HP GAP: {hp_gap:.3f}"
+        )
 
-    # unrealistic HP jump
-    if abs(p1_loss) > 0.45 or abs(p2_loss) > 0.45:
+        print(
+            f"📊 TIME: {time_left:.3f}"
+        )
 
-        reward -= 10.0
+        probs = torch.softmax(
+            q_values,
+            dim=1
+        )
 
-    # =====================================================
-    # 7. TERMINAL REWARD
-    # =====================================================
+        confidence, action_idx = torch.max(
+            probs,
+            dim=1
+        )
 
-    if next_state.get("done", False):
+        confidence = confidence.item()
 
-        if next_state["p1_hp_ratio"] <= 0:
+        action_idx = action_idx.item()
 
-            reward -= 30.0
+    # =================================================
+    # CONFIDENCE GATE
+    # =================================================
 
-        elif next_state["p2_hp_ratio"] <= 0:
+    # if confidence < confidence_threshold:
 
-            reward += 30.0
+    #     return "NONE", 1.0
 
-    # =====================================================
-    # NORMALIZATION
-    # =====================================================
+    action = ACTIONS[action_idx]
 
-    reward = max(min(reward, 30.0), -30.0)
+    # =================================================
+    # ADAPTIVE VALUE
+    # =================================================
 
-    reward /= 30.0
+    if hp_gap > 0.35:
 
-    return reward
+        value = 1.30
 
-def save_dataset(prev, action, action_value, reward, curr):
+    elif hp_gap > 0.22:
+
+        value = 1.20
+
+    elif hp_gap > 0.12:
+
+        value = 1.10
+
+    else:
+
+        value = 1.05
+
+    # =================================================
+    # CONTEXTUAL ADJUSTMENT
+    # =================================================
+
+    if (
+        action == "BOOST_DEFENSE"
+        and
+        pressure_diff > 3
+    ):
+
+        value += 0.05
+
+    elif (
+        action == "BOOST_GAUGE"
+        and
+        (
+            gauge_gap > 0.30
+            or
+            ultra_gap > 0.30
+        )
+    ):
+
+        value += 0.05
+
+    value = min(value, 1.35)
+
+    return action, round(value, 2)
+
+def save_dataset(prev, action, action_value, curr):
 
     global SAMPLE_ID
     global ROUND_ID
@@ -398,7 +324,7 @@ def save_dataset(prev, action, action_value, reward, curr):
 
     metadata = {
 
-        "dataset_version": "v2",
+        "dataset_version": "v3",
         # ---------------------------------------------
         # dataset indexing
         # ---------------------------------------------
@@ -418,20 +344,12 @@ def save_dataset(prev, action, action_value, reward, curr):
         "p2_character": p2_character,
 
         # ---------------------------------------------
-        # timestamp
-        # ---------------------------------------------
-
-        "timestamp": time.time(),
-
-        # ---------------------------------------------
         # gameplay context
         # ---------------------------------------------
 
         "action": action,
 
         "action_value": action_value,
-
-        "reward": reward,
 
         # ---------------------------------------------
         # state transition
@@ -563,18 +481,7 @@ while True:
 
                 last_terminal_signature = sig
 
-                reward = compute_reward(
-                    prev_state,
-                    state
-                )
-
-                save_dataset(
-                    prev_state,
-                    "NONE",
-                    1.0,
-                    reward,
-                    state
-                )
+                save_dataset(prev_state, "NONE", 1.0, state )
 
                 print("🏁 TERMINAL SAVED")
 
@@ -667,12 +574,26 @@ while True:
         prev_state = None
         continue
 
-    # ================= ACTION =================
+    # ================= WHEN BOOST IS ACTIVE =================
     if state.get("is_boost_active", False):
 
-        write_action("NONE", 1.0)
+        active_action = state.get(
+            "current_action",
+            "NONE"
+        )
 
-        time.sleep(0.3)
+        value = state.get(
+            "action_value",
+            1.0
+        )
+
+        # keep boost state alive
+        write_action(
+            active_action,
+            value
+        )
+
+        time.sleep(0.30)
 
         next_state = read_json(STATE_FILE)
 
@@ -682,24 +603,23 @@ while True:
         if is_same_state(state, next_state):
             continue
 
-        reward = compute_reward(state, next_state)
-
         save_dataset(
             state,
-            "NONE",
-            1.0,
-            reward,
+            active_action,
+            value,
             next_state
         )
 
         prev_state = next_state
 
-        print("👀 OBSERVING ACTIVE BOOST")
+        print(
+            f"👀 OBSERVING ACTIVE BOOST: "
+            f"{active_action}"
+        )
 
         continue
     
     action, value = model_policy(state)
-
 
     if action == "NONE":
 
@@ -716,20 +636,14 @@ while True:
         if is_same_state(state, next_state):
             continue
 
-        reward = compute_reward(
-            state,
-            next_state
-        )
-
         save_dataset(
             state,
             "NONE",
             1.0,
-            reward,
             next_state
         )
 
-        print(f"📊 NONE | reward: {reward:.4f}")
+        print(f"📊 NONE")
 
         prev_state = next_state
 
@@ -739,7 +653,7 @@ while True:
     write_action(action, value)
     last_action_time = time.time()
 
-    time.sleep(1.0)
+    time.sleep(0.75)
 
     next_state = read_json(STATE_FILE)
     
@@ -751,7 +665,7 @@ while True:
 
         print("⚠ SAME STATE TRANSITION")
 
-        prev_state = state
+        prev_state = next_state
 
         continue
     
@@ -760,14 +674,14 @@ while True:
 
         print("⚠ ACTION NOT APPLIED")
 
-        prev_state = state
+        prev_state = next_state
 
         continue
     if not next_state.get("is_boost_active", False):
 
         print("⚠ BOOST NOT ACTIVE")
 
-        prev_state = state
+        prev_state = next_state
 
         continue
     # ================= VALIDATE NEXT STATE =================
@@ -787,10 +701,9 @@ while True:
         continue
 
     # ================= SAVE NORMAL =================
-    reward = compute_reward(state, next_state)
-    save_dataset(state, action, value, reward, next_state)
+    save_dataset(state, action, value, next_state)
 
-    print(f"📊 {action} | reward: {reward:.4f}")
+    print(f"📊 {action} | value: {value:.2f}")
 
     # ================= UPDATE =================
-    prev_state = state
+    prev_state = next_state
